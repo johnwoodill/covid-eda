@@ -12,4 +12,4 @@ Figure 2: US Mortality Multiplier
 
 <p align="center">
 
-<img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/2-US-Mortality-Mulitplier.png?raw=true">
+<img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/2-US-Mortality-Mulitiplier.png?raw=true">
