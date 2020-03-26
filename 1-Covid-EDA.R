@@ -20,24 +20,37 @@ ccdat <- cdat %>%
   ungroup()
 ccdat
 
+ccdat$value <- log(ccdat$value)
+
 clabels <- ccdat %>% 
   group_by(country) %>% 
-  filter(row_number()==n())
+  filter(row_number()==n()) 
+  # mutate(value = exp(value))
 clabels
   
-ggplot(ccdat, aes(x=ndays, y=log(value), color=factor(country))) + 
+
+
+ggplot(ccdat, aes(x=ndays, y=value, color=factor(country))) + 
   geom_point(size=0.75) +
   geom_line() +
-  theme_tufte(12) +
+  theme_bw(12) +
   labs(x="Number of days since 10th Death", y="Cumulative Number of Deaths \n (Expressed in logs, displayed as real)") +
   theme(panel.border = element_rect(colour = "grey", fill=NA, size=1),
         legend.position = "none") +
+  scale_y_continuous(breaks = c(min(ccdat$value), 3, 4, 5, 6, 7, 8, 9, 10), 
+                     labels = round(c(min(exp(ccdat$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8), exp(9), exp(9.5)), 0),
+                     expand=c(0, 0),
+                     limits = c(min(ccdat$value), 10)) +
+  scale_x_continuous(breaks = seq(0, 70, 5),
+                     expand= c(0,0),
+                     limits = c(0, 70)) +
   geom_text_repel(data=clabels, aes(label = country),
-          force=1,
+          # force=1,
           point.padding=unit(1,'lines'),
-          direction = 'y',
+          direction = 'x',
           nudge_x = 1.5,
-          segment.size=0.1) + 
+          segment.alpha = 0.75) + 
+  # coord_trans(y = "exp") +
   NULL
 
 ggsave("~/Projects/covid-eda/figures/1-World-Rate.png", width = 10, height = 6)
@@ -122,7 +135,7 @@ usdat3 <- usdat2 %>%
 ggplot(filter(usdat3, date >= as.Date("2020-03-05")), aes(date, diff, color=factor(rm))) + 
   geom_point() + 
   geom_line() +
-  theme_bw() +
+  theme_bw(12) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_x_date(date_labels = '%m/%d', 
                limits = c(as.Date("2020-03-05"), max(usdat$date) + 2), 
