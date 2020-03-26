@@ -110,7 +110,7 @@ ggplot(filter(usdat2, date >= as.Date("2020-03-03")), aes(date, value*100, color
           xlim = c(max(usdat$date) + 1.5)) +
   NULL
   
-ggsave("~/Projects/covid-eda/figures/2-US-Mortality-Multiplier.png", width = 12.5, height = 5)
+ggsave("~/Projects/covid-eda/figures/2-US-Mortality-Multiplier.png", width = 12.5, height = 6)
 
 usdat[nrow(usdat), ]
 
