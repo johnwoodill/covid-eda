@@ -35,7 +35,7 @@ ggplot(ccdat, aes(x=ndays, y=value, color=factor(country))) +
   geom_line() +
   theme_bw(12) +
   labs(x="Number of days since 10th Death", y="Cumulative Number of Deaths \n (Expressed in logs, displayed as real)") +
-  theme(panel.border = element_rect(colour = "grey", fill=NA, size=1),
+  theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
         legend.position = "none") +
   scale_y_continuous(breaks = c(min(ccdat$value), 3, 4, 5, 6, 7, 8, 9, 10), 
                      labels = round(c(min(exp(ccdat$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8), exp(9), exp(9.5)), 0),

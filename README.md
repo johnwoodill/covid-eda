@@ -1,4 +1,6 @@
-# covid-eda
+## Coronavirus EDA
+
+Analysis of the coronavirus pandemic inspired by the great data visualiziation by John Burn-Murdoch at the Financial Times (https://www.ft.com/coronavirus-latest)
 
 ----------------------------
 
