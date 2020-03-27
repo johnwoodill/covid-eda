@@ -15,3 +15,9 @@ Figure 2: US Mortality Multiplier
 <p align="center">
 
 <img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/2-US-Mortality-Multiplier.png?raw=true">
+
+Figure 3: US Cumulative Number of Deaths since 10th Death
+
+<p align="center">
+
+<img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/3-US-State-Rate.png?raw=true">

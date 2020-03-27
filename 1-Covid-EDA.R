@@ -1,6 +1,7 @@
 library(tidyverse)
 library(zoo)
 library(ggrepel)
+library(lubridate)
 
 cdat <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv")
 cdat <- select(cdat, -Lat, -Long)
@@ -14,8 +15,8 @@ cdat$date <- as.Date(cdat$date, "%m/%d/%y")
 ccdat <- cdat %>% 
   filter(value >= 10 & (country %in% c("US", "China", "Italy", "Iran", "Spain", "UK", "Japan", "Korea", "France"))) %>% 
   group_by(country, date) %>% 
-  arrange(date) %>% 
-  summarise(value = sum((value))) %>%
+  arrange(date) %>%
+  summarise(value = sum(value)) %>%
   mutate(ndays = seq(1, n(), 1)) %>% 
   ungroup()
 ccdat
@@ -73,8 +74,6 @@ usdat <- usdat %>%
   arrange(date) %>% 
   ungroup
 
-ggplot(usdat, aes(date, log(value), group=1)) + geom_line()
-
 usdat$rm2 <- rollmean(usdat$value, k = 2, na.pad = TRUE, align = "right")
 usdat$rm3 <- rollmean(usdat$value, k = 3, na.pad = TRUE, align = "right")
 usdat$rm4 <- rollmean(usdat$value, k = 4, na.pad = TRUE, align = "right")
@@ -83,11 +82,6 @@ usdat
 usdat$RM1 <- (usdat$value - lag(usdat$value))/(lag(usdat$value))
 usdat$RM2 <- (usdat$rm2 - lag(usdat$rm2))/(lag(usdat$rm2))
 usdat$RM3 <- (usdat$rm3 - lag(usdat$rm3))/(lag(usdat$rm3))
-
-p1 <- ggplot(filter(usdat, date >= as.Date("2020-03-03")), aes(date, pc)) + 
-  geom_point() + 
-  geom_line() +
-  NULL
 
 usdat2 <- select(usdat, -value, -rm2, -rm3, -rm4) %>% 
   gather(key=rm, value=value, -date)
@@ -146,28 +140,53 @@ ggplot(filter(usdat3, date >= as.Date("2020-03-05")), aes(date, diff, color=fact
 
 usdat[nrow(usdat), ]
 
-# Regression analysis
 
-regdat <- cdat
-regdat <- regdat %>% 
-  filter(value > 0 & country == "US") %>% 
+
+# County/State Data
+uscdat <- read_csv("http://covidtracking.com/api/states/daily.csv")
+uscdat$date <- as.Date(paste0(substr(uscdat$date, 1, 4), "-", substr(uscdat$date, 5, 6), "-", substr(uscdat$date, 7, 8)))
+
+# Get US regions
+regions <- data.frame(state = state.abb, regions = state.region)
+
+uscdat2 <- uscdat %>% 
+  filter(death >= 10) %>%
+  group_by(date, state) %>% 
+  summarise(value = sum(death, na.rm = TRUE)) %>% 
+  group_by(state) %>% 
   arrange(date) %>% 
-  ungroup
+  mutate(ndays = seq(1, n(), 1)) %>% 
+  ungroup() %>% 
+  left_join(regions, by="state")
 
-regdat <- usdat
-regdat$date <- as.Date(regdat$date, "%m/%d/%y")
-regdat$trend <- day(regdat$date)
-regdat$trend_week <- week(regdat$date)
-regdat$lag_value <- lag(regdat$value)
-regdat
+uscdat2
 
-mod <- lm(log(value) ~ trend + I(trend^2), data = regdat)
-summary(mod)
-sum(mod$coefficients[2:3])*tail(regdat$trend, 1)
 
-plot(exp(predict(mod)))
 
-mod2 <- lm(log(value) ~ factor(trend_week), data = regdat)
-summary(mod2)
+uscdat2$value <- log(uscdat2$value)
 
-sum(mod$coefficients)*tail(regdat$trend, 1)
+ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) + 
+  geom_point(size=0.75) +
+  geom_line() +
+  theme_bw(12) +
+  labs(x="Number of days since 10th Death", y="Cumulative Number of Deaths \n (Expressed in logs, displayed as real)") +
+  theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
+        legend.position = "none") +
+  scale_y_continuous(breaks = c(2, 3, 4, 5, 6, 7),
+                     labels = round(c(min(exp(uscdat2$value)), exp(3), exp(4), exp(5), exp(6), exp(7)), 0),
+                     expand=c(0, 0),
+                     limits = c(2, 7)) +
+  # scale_x_continuous(breaks = seq(0, 20, 1),
+  #                    expand= c(0,0),
+  #                    limits = c(0, 20)) +
+  geom_text_repel(data = filter(uscdat2, date == today()), aes(label = state),
+          force=1,
+          point.padding=unit(1,'lines'),
+          direction = 'x',
+          nudge_x = 1.5,
+          segment.alpha = 0.75) +
+  facet_wrap(~regions) +
+  NULL
+  
+ggsave("~/Projects/covid-eda/figures/3-US-State-Rate.png", width = 12.5, height = 6)
+
