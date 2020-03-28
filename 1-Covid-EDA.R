@@ -2,6 +2,89 @@ library(tidyverse)
 library(zoo)
 library(ggrepel)
 library(lubridate)
+library(choroplethr)
+library(choroplethrMaps)
+library(RColorBrewer)
+
+# # Map of Counties
+# 
+# mapdat <- read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv")
+# current_date <- last(mapdat$date)
+# current_date
+# 
+# mapdat1 <- mapdat %>% 
+#   group_by(state, fips) %>% 
+#   summarise(total_deaths = sum(deaths, na.rm = TRUE),
+#             total_cases = sum(cases, na.rm = TRUE)) %>% 
+#   ungroup() %>% 
+#   select(fips, total_deaths) %>% 
+#   filter(!is.na(fips))
+# 
+# 
+# mapdat1 <- filter(mapdat1, total_deaths >= 5)
+# 
+# # mapdat1$total_deaths <- ifelse(is.na(mapdat1$total_deaths), 0, mapdat1$total_deaths)
+# 
+# 
+# 
+# names(mapdat1) <- c("region", "value")
+# 
+# # usfips <- unique(usmap$fips)
+# mapdat1$region <- str_remove(mapdat1$region, "^0+")
+# 
+# # Remove fips with 999
+# mapdat1 <- mapdat1[-which(substr(mapdat1$region, nchar(mapdat1$region) - 1, nchar(mapdat1$region)) == 99), ]
+# # mapdat1 <- mapdat1[-which(substr(mapdat1$region, nchar(mapdat1$region) - 1, nchar(mapdat1$region)) == 98), ]
+# 
+# mapdat1$region <- as.numeric(mapdat1$region)
+# # mapdat1$value <- cut(mapdat1$value, breaks = 9)
+# 
+# # mapdat1$value <- as.factor(mapdat1$value)
+# 
+# choro = CountyChoropleth$new(mapdat1)
+# choro$title = "2012 Population Estimates"
+# choro$set_num_colors(9)
+# choro$ggplot_scale = scale_fill_brewer(name="Population", palette=7, drop=FALSE)
+# choro$render()
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# covid_map <- county_choropleth(mapdat1)
+# #covid_map
+# 
+# covid_map$data$value <- ifelse(is.na(covid_map$data$value), 0, covid_map$data$value)
+# 
+# covid_map <- covid_map + 
+#   # scale_fill_manual(values=cc) +
+#   # scale_fill_brewer(palette = "YlOrRd", 7, na.value = "Yl") +
+#   # scale_fill_gradient(cc) +
+#   # scale_fill_brewer(palette = "Spectral") +
+#   scale_fill_gradientn(colors = viridis(5), 
+#                        breaks = c(100, 200, 350, 400, 500),
+#                        limit = c(0, 200)) +
+#   # lims(fill = c(0, 500)) +
+#   theme_tufte(base_size = 10)+
+#   xlab(NULL) + ylab(NULL)  +
+#   # theme(legend.position = "none",
+#   #                      axis.text.x = element_blank(),
+#   #                      axis.text.y = element_blank(),
+#   #                      axis.ticks.x = element_blank(),
+#   #                      axis.ticks.y = element_blank(),
+#   #                      panel.border = element_rect(fill = NA))
+#   NULL
+# covid_map
+
+
+
+
+
+
+# ---------------------------------------------------------------
 
 cdat <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv")
 cdat <- select(cdat, -Lat, -Long)
@@ -117,28 +200,9 @@ ggplot(filter(usdat2, date >= as.Date("2020-03-03")), aes(date, value*100, color
           xlim = c(max(usdat$date) + 2.5)) +
   NULL
   
-ggsave("~/Projects/covid-eda/figures/2-US-Mortality-Multiplier.png", width = 12.5, height = 6)
+ggsave("~/Projects/covid-eda/figures/2-US-Mortality-Multiplier.png", width = 15, height = 8)
 
-usdat[nrow(usdat), ]
 
-usdat3 <- usdat2 %>% 
-  group_by(rm) %>% 
-  arrange(date) %>% 
-  mutate(diff = value - lag(value))
-
-ggplot(filter(usdat3, date >= as.Date("2020-03-05")), aes(date, diff, color=factor(rm))) + 
-  geom_point() + 
-  geom_line() +
-  theme_bw(12) +
-  geom_hline(yintercept = 0, linetype = "dashed") +
-  scale_x_date(date_labels = '%m/%d', 
-               limits = c(as.Date("2020-03-05"), max(usdat$date) + 2), 
-               breaks = seq(min(usdat$date), max(usdat$date), "day")) +
-  labs(x=NULL, y="Difference in % Change") +
-  theme(legend.position = "top") +
-  NULL
-
-usdat[nrow(usdat), ]
 
 
 
@@ -161,8 +225,6 @@ uscdat2 <- uscdat %>%
 
 uscdat2
 
-
-
 uscdat2$value <- log(uscdat2$value)
 
 ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) + 
@@ -176,10 +238,10 @@ ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) +
                      labels = round(c(min(exp(uscdat2$value)), exp(3), exp(4), exp(5), exp(6), exp(7)), 0),
                      expand=c(0, 0),
                      limits = c(2, 7)) +
-  # scale_x_continuous(breaks = seq(0, 20, 1),
-  #                    expand= c(0,0),
-  #                    limits = c(0, 20)) +
-  geom_text_repel(data = filter(uscdat2, date == today()), aes(label = state),
+  scale_x_continuous(breaks = seq(0, 20, 1),
+                     expand= c(0,0),
+                     limits = c(0, 20)) +
+  geom_text_repel(data = filter(uscdat2, date == last(uscdat2$date)), aes(label = state),
           force=1,
           point.padding=unit(1,'lines'),
           direction = 'x',
@@ -190,3 +252,5 @@ ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) +
   
 ggsave("~/Projects/covid-eda/figures/3-US-State-Rate.png", width = 12.5, height = 6)
 
+
+usdat[nrow(usdat), ]
