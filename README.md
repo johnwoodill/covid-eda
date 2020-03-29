@@ -12,7 +12,7 @@ Analysis of the coronavirus pandemic inspired by the great data visualiziation b
 
 Figure provides the cumulative number of world deaths since the 10th death in each country. The x-axis is the number of days since the 10th death and the y-axis is the real deaths for each country. The observations in the plot are expressed in log_10, which measures the exponential growth in the absolute values (linear increases in log_10 represent exponential growth of the absolute values). This allows for a comparative analysis across countries. We do not need population data when using log because the log of a fraction is simply the difference of the denominator (log(x/y) = log(x) - log(y) where log(y) is the constant population).
 
-
+----------------------------
 
 **Figure 2: US Cumulative Number of Deaths since 10th Death**
 
@@ -22,6 +22,7 @@ Figure provides the cumulative number of world deaths since the 10th death in ea
 
 Figure provides US cumulative number of deaths since the 10th death grouped by US regional states. The x-axis is the number of days since the 10th death and the y-axis is the real deaths for each country. The observations in the plot are expressed in log_10, which measures the exponential growth in the absolute values (linear increases in log_10 represent exponential growth of the absolute values).
 
+----------------------------
 
 **Figure 3: US Mortality Multiplier**
 
