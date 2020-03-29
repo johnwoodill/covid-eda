@@ -20,7 +20,7 @@ Figure provides the cumulative number of world deaths since the 10th death in ea
 
 <img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/2-US-State-Rate.png?raw=true">
 
-Figure provides US cumulative number of deaths since the 10th death grouped by US regional states. 
+Figure provides US cumulative number of deaths since the 10th death grouped by US regional states. The x-axis is the number of days since the 10th death and the y-axis is the real deaths for each country. The observations in the plot are expressed in log_10, which measures the exponential growth in the absolute values (linear increases in log_10 represent exponential growth of the absolute values).
 
 
 **Figure 3: US Mortality Multiplier**
