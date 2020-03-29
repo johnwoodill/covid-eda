@@ -140,10 +140,6 @@ ggplot(ccdat, aes(x=ndays, y=value, color=factor(country))) +
 ggsave("~/Projects/covid-eda/figures/1-World-Rate.png", width = 10, height = 6)
 #
 
-
-
-
-
 # US data --------------------------------------------------------
 usdat <- filter(cdat, country == "US")
 usdat
@@ -251,7 +247,7 @@ ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) +
   facet_wrap(~regions) +
   NULL
   
-ggsave("~/Projects/covid-eda/figures/3-US-State-Rate.png", width = 12.5, height = 6)
+ggsave("~/Projects/covid-eda/figures/3-US-State-Rate.png", width = 15, height = 10)
 
 
 usdat[nrow(usdat), ]
