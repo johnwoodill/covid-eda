@@ -89,20 +89,42 @@ library(RColorBrewer)
 cdat <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv")
 cdat <- select(cdat, -Lat, -Long)
 
+nonny <- read_csv("http://covidtracking.com/api/states/daily.csv")
+nonny <- select(nonny, state, date, death)
+nonny <- filter(nonny, state != "NY")
+names(nonny) <- c("country", "date", "value")
+nonny <- nonny %>% 
+  group_by(date) %>% 
+  summarise(value = sum(value, na.rm= TRUE)) %>% 
+  mutate(country = "US(Non-NY)") %>% 
+  select(country, date, value) %>% 
+  ungroup()
+
+nonny$date <- as.Date(paste0(substr(nonny$date, 1, 4), "-", substr(nonny$date, 5, 6), "-", substr(nonny$date, 7, 8)))
+nonny$date <- as.Date(as.character(nonny$date), "%Y-%m-%d")
+nonny$date <- format(nonny$date, "%m/%d/%Y")
+
+
+
 cdat <- gather(cdat, key = date, value=value, -`Province/State`, -`Country/Region`)
 names(cdat) <- c("state", "country", "date", "value")
+cdat <- select(cdat, country, date, value)
+
+cdat <- rbind(cdat, nonny)
 
 cdat$date <- as.Date(cdat$date, "%m/%d/%y")
 
 # World data -----------------------------------------------------
 ccdat <- cdat %>% 
-  filter(value >= 10 & (country %in% c("US", "China", "Italy", "Iran", "Spain", "UK", "Japan", "Korea, South", "France"))) %>% 
+  filter(value >= 10 & (country %in% c("US", "US(Non-NY)", "China", "Italy", "Iran", "Spain", "UK", "Japan", "Korea, South", "France"))) %>% 
   group_by(country, date) %>% 
   arrange(date) %>%
   summarise(value = sum(value)) %>%
   mutate(ndays = seq(1, n(), 1)) %>% 
   ungroup()
 ccdat
+
+
 
 ccdat$value <- log(ccdat$value)
 
@@ -111,6 +133,7 @@ clabels <- ccdat %>%
   filter(row_number()==n()) 
   # mutate(value = exp(value))
 clabels
+
   
 
 
@@ -118,7 +141,7 @@ ggplot(ccdat, aes(x=ndays, y=value, color=factor(country))) +
   geom_point(size=0.75) +
   geom_line() +
   theme_bw(12) +
-  labs(x="Number of days since 10th Death", y="Cumulative Number of Deaths \n (Expressed in logs, displayed as real)") +
+  labs(x="Number of days since 10th Death", y="Cumulative Number of Deaths \n (Expressed in logs, displayed as absolute values)") +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
         legend.position = "none") +
   scale_y_continuous(breaks = c(min(ccdat$value), 3, 4, 5, 6, 7, 8, 9, 10), 
@@ -139,6 +162,59 @@ ggplot(ccdat, aes(x=ndays, y=value, color=factor(country))) +
 
 ggsave("~/Projects/covid-eda/figures/1-World-Rate.png", width = 10, height = 6)
 #
+
+# County/State Data
+uscdat <- read_csv("http://covidtracking.com/api/states/daily.csv")
+uscdat$date <- as.Date(paste0(substr(uscdat$date, 1, 4), "-", substr(uscdat$date, 5, 6), "-", substr(uscdat$date, 7, 8)))
+
+# Get US regions
+regions <- data.frame(state = state.abb, regions = state.region)
+
+uscdat2 <- uscdat %>% 
+  filter(death >= 10) %>%
+  group_by(date, state) %>% 
+  summarise(value = sum(death, na.rm = TRUE)) %>% 
+  group_by(state) %>% 
+  arrange(date) %>% 
+  mutate(ndays = seq(1, n(), 1)) %>% 
+  ungroup() %>% 
+  left_join(regions, by="state")
+
+uscdat2
+
+
+uscdat2$value <- log(uscdat2$value)
+
+ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) + 
+  geom_point(size=0.75) +
+  geom_line() +
+  theme_bw(12) +
+  labs(x="Number of days since 10th Death", y="Cumulative Number of Deaths \n (Expressed in logs, displayed as real)") +
+  theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
+        legend.position = "none") +
+  scale_y_continuous(breaks = c(2, 3, 4, 5, 6, 7),
+                     labels = round(c(min(exp(uscdat2$value)), exp(3), exp(4), exp(5), exp(6), exp(7)), 0),
+                     expand=c(0, 0),
+                     limits = c(2, 7)) +
+  scale_x_continuous(breaks = seq(0, 20, 1),
+                     expand= c(0,0),
+                     limits = c(0, 20)) +
+  geom_text_repel(data = filter(uscdat2, date == last(uscdat2$date)), aes(label = state),
+          force=1,
+          point.padding=unit(1,'lines'),
+          direction = 'x',
+          nudge_x = 1.5,
+          segment.alpha = 0.75) +
+  facet_wrap(~regions) +
+  NULL
+  
+ggsave("~/Projects/covid-eda/figures/2-US-State-Rate.png", width = 15, height = 10)
+
+
+
+
+
+
 
 # US data --------------------------------------------------------
 usdat <- filter(cdat, country == "US")
@@ -197,57 +273,6 @@ ggplot(filter(usdat2, date >= as.Date("2020-03-03")), aes(date, value*100, color
           xlim = c(max(usdat$date) + 2.5)) +
   NULL
   
-ggsave("~/Projects/covid-eda/figures/2-US-Mortality-Multiplier.png", width = 12.5, height = 6)
-
-
-
-
-
-# County/State Data
-uscdat <- read_csv("http://covidtracking.com/api/states/daily.csv")
-uscdat$date <- as.Date(paste0(substr(uscdat$date, 1, 4), "-", substr(uscdat$date, 5, 6), "-", substr(uscdat$date, 7, 8)))
-
-# Get US regions
-regions <- data.frame(state = state.abb, regions = state.region)
-
-uscdat2 <- uscdat %>% 
-  filter(death >= 10) %>%
-  group_by(date, state) %>% 
-  summarise(value = sum(death, na.rm = TRUE)) %>% 
-  group_by(state) %>% 
-  arrange(date) %>% 
-  mutate(ndays = seq(1, n(), 1)) %>% 
-  ungroup() %>% 
-  left_join(regions, by="state")
-
-uscdat2
-
-uscdat2$value <- log(uscdat2$value)
-
-ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) + 
-  geom_point(size=0.75) +
-  geom_line() +
-  theme_bw(12) +
-  labs(x="Number of days since 10th Death", y="Cumulative Number of Deaths \n (Expressed in logs, displayed as real)") +
-  theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
-        legend.position = "none") +
-  scale_y_continuous(breaks = c(2, 3, 4, 5, 6, 7),
-                     labels = round(c(min(exp(uscdat2$value)), exp(3), exp(4), exp(5), exp(6), exp(7)), 0),
-                     expand=c(0, 0),
-                     limits = c(2, 7)) +
-  scale_x_continuous(breaks = seq(0, 20, 1),
-                     expand= c(0,0),
-                     limits = c(0, 20)) +
-  geom_text_repel(data = filter(uscdat2, date == last(uscdat2$date)), aes(label = state),
-          force=1,
-          point.padding=unit(1,'lines'),
-          direction = 'x',
-          nudge_x = 1.5,
-          segment.alpha = 0.75) +
-  facet_wrap(~regions) +
-  NULL
-  
-ggsave("~/Projects/covid-eda/figures/3-US-State-Rate.png", width = 15, height = 10)
-
+ggsave("~/Projects/covid-eda/figures/3-US-Mortality-Multiplier.png", width = 12.5, height = 6)
 
 usdat[nrow(usdat), ]
