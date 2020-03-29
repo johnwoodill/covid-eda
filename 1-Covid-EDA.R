@@ -96,7 +96,7 @@ cdat$date <- as.Date(cdat$date, "%m/%d/%y")
 
 # World data -----------------------------------------------------
 ccdat <- cdat %>% 
-  filter(value >= 10 & (country %in% c("US", "China", "Italy", "Iran", "Spain", "UK", "Japan", "Korea", "France"))) %>% 
+  filter(value >= 10 & (country %in% c("US", "China", "Italy", "Iran", "Spain", "UK", "Japan", "Korea, South", "France"))) %>% 
   group_by(country, date) %>% 
   arrange(date) %>%
   summarise(value = sum(value)) %>%
@@ -143,6 +143,7 @@ ggsave("~/Projects/covid-eda/figures/1-World-Rate.png", width = 10, height = 6)
 
 
 
+
 # US data --------------------------------------------------------
 usdat <- filter(cdat, country == "US")
 usdat
@@ -162,9 +163,9 @@ usdat$rm3 <- rollmean(usdat$value, k = 3, na.pad = TRUE, align = "right")
 usdat$rm4 <- rollmean(usdat$value, k = 4, na.pad = TRUE, align = "right")
 usdat
 
-usdat$RM1 <- (usdat$value - lag(usdat$value))/(lag(usdat$value))
-usdat$RM2 <- (usdat$rm2 - lag(usdat$rm2))/(lag(usdat$rm2))
-usdat$RM3 <- (usdat$rm3 - lag(usdat$rm3))/(lag(usdat$rm3))
+usdat$`R-RM1` <- (usdat$value - lag(usdat$value))/(lag(usdat$value))
+usdat$`R-RM2` <- (usdat$rm2 - lag(usdat$rm2))/(lag(usdat$rm2))
+usdat$`R-RM3` <- (usdat$rm3 - lag(usdat$rm3))/(lag(usdat$rm3))
 
 usdat2 <- select(usdat, -value, -rm2, -rm3, -rm4) %>% 
   gather(key=rm, value=value, -date)
@@ -200,7 +201,7 @@ ggplot(filter(usdat2, date >= as.Date("2020-03-03")), aes(date, value*100, color
           xlim = c(max(usdat$date) + 2.5)) +
   NULL
   
-ggsave("~/Projects/covid-eda/figures/2-US-Mortality-Multiplier.png", width = 15, height = 8)
+ggsave("~/Projects/covid-eda/figures/2-US-Mortality-Multiplier.png", width = 12.5, height = 6)
 
 
 
