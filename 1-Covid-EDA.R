@@ -96,7 +96,7 @@ names(nonny) <- c("country", "date", "value")
 nonny <- nonny %>% 
   group_by(date) %>% 
   summarise(value = sum(value, na.rm= TRUE)) %>% 
-  mutate(country = "US(Non-NY)") %>% 
+  mutate(country = "US(non-NY)") %>% 
   select(country, date, value) %>% 
   ungroup()
 
@@ -116,7 +116,7 @@ cdat$date <- as.Date(cdat$date, "%m/%d/%y")
 
 # World data -----------------------------------------------------
 ccdat <- cdat %>% 
-  filter(value >= 10 & (country %in% c("US", "US(Non-NY)", "China", "Italy", "Iran", "Spain", "UK", "Japan", "Korea, South", "France"))) %>% 
+  filter(value >= 10 & (country %in% c("US", "US(non-NY)", "China", "Italy", "Iran", "Spain", "United Kingdom", "Japan", "Korea, South", "France"))) %>% 
   group_by(country, date) %>% 
   arrange(date) %>%
   summarise(value = sum(value)) %>%
@@ -124,7 +124,7 @@ ccdat <- cdat %>%
   ungroup()
 ccdat
 
-
+ccdat$country <- ifelse(ccdat$country == "United Kingdom", "UK", ccdat$country)
 
 ccdat$value <- log(ccdat$value)
 
@@ -135,16 +135,19 @@ clabels <- ccdat %>%
 clabels
 
   
-
+ccdat$cat <- as.character(ifelse(ccdat$country == "US", 1, 0))
+ccdat$cat <- as.character(ifelse(ccdat$country == "US(non-NY)", 2, ccdat$cat))
 
 ggplot(ccdat, aes(x=ndays, y=value, color=factor(country))) + 
+  # scale_alpha_manual(values = c(0.5, 1), guide = FALSE) +
   geom_point(size=0.75) +
   geom_line() +
+  # scale_color_manual(values=c("2" = "RoyalBlue", "1" = "DarkGrey", "0"="LightGrey")) +
   theme_bw(12) +
   labs(x="Number of days since 10th Death", y="Cumulative Number of Deaths \n (Expressed in logs, displayed as absolute values)") +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
         legend.position = "none") +
-  scale_y_continuous(breaks = c(min(ccdat$value), 3, 4, 5, 6, 7, 8, 9, 10), 
+  scale_y_continuous(breaks = c(min(ccdat$value), 3, 4, 5, 6, 7, 8, 9, 10),
                      labels = round(c(min(exp(ccdat$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8), exp(9), exp(9.5)), 0),
                      expand=c(0, 0),
                      limits = c(min(ccdat$value), 10)) +
@@ -156,8 +159,7 @@ ggplot(ccdat, aes(x=ndays, y=value, color=factor(country))) +
           point.padding=unit(1,'lines'),
           direction = 'x',
           nudge_x = 1.5,
-          segment.alpha = 0.75) + 
-  # coord_trans(y = "exp") +
+          segment.alpha = 0.75) +
   NULL
 
 ggsave("~/Projects/covid-eda/figures/1-World-Rate.png", width = 10, height = 6)
