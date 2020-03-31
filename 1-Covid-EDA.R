@@ -120,7 +120,10 @@ ccdat <- cdat %>%
   group_by(country, date) %>% 
   arrange(date) %>%
   summarise(value = sum(value)) %>%
-  mutate(ndays = seq(1, n(), 1)) %>% 
+  mutate(daily_deaths = value - lag(value),
+         ndays = seq(1, n(), 1),
+         value_rm3 = rollmean(daily_deaths, k = 3, align = "right", na.pad = TRUE)) %>% 
+  group_by(country, date) %>% 
   ungroup()
 ccdat
 
@@ -163,6 +166,38 @@ ggplot(ccdat, aes(x=ndays, y=value, color=factor(country))) +
   NULL
 
 ggsave("~/Projects/covid-eda/figures/1-World-Rate.png", width = 10, height = 6)
+
+
+
+# World Rolling Mean Death Rate
+ggplot(filter(ccdat, country != "China"), aes(x=ndays, y=value_rm3, color=factor(country))) + 
+  # scale_alpha_manual(values = c(0.5, 1), guide = FALSE) +
+  geom_point(size=0.75) +
+  geom_line() +
+  # scale_color_manual(values=c("2" = "RoyalBlue", "1" = "DarkGrey", "0"="LightGrey")) +
+  theme_bw(12) +
+  labs(x="Number of days since 10th Death", y="Daily Number of Deaths \n (Right-rolling 3-day mean)") +
+  theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
+        legend.position = "none") +
+  # scale_y_continuous(breaks = c(0, 1, 2, 3, 4, 5, 6, 7),
+  #                    labels = round(c(exp(0), exp(1), exp(2), exp(3), exp(4), exp(5), exp(6), exp(7)), 0),
+  #                    expand=c(0, 0),
+  #                    limits = c(0, 7)) +
+  scale_x_continuous(breaks = seq(0, 40, 5),
+                     expand= c(0,0),
+                     limits = c(0, 50)) +
+  geom_text_repel(data=filter(clabels, country != "China"), aes(label = country),
+          # force=1,
+          point.padding=unit(1,'lines'),
+          direction = 'x',
+          nudge_x = 1.5,
+          segment.alpha = 0.75) +
+  NULL
+
+
+ggsave("~/Projects/covid-eda/figures/2-World-Daily-Death-Rate.png", width = 10, height = 6)
+
+
 #
 
 # County/State Data
@@ -180,7 +215,8 @@ uscdat2 <- uscdat %>%
   arrange(date) %>% 
   mutate(ndays = seq(1, n(), 1)) %>% 
   ungroup() %>% 
-  left_join(regions, by="state")
+  left_join(regions, by="state") %>% 
+  ungroup()
 
 uscdat2
 
@@ -194,13 +230,13 @@ ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) +
   labs(x="Number of days since 10th Death", y="Cumulative Number of Deaths \n (Expressed in logs, displayed as real)") +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
         legend.position = "none") +
-  scale_y_continuous(breaks = c(2, 3, 4, 5, 6, 7),
-                     labels = round(c(min(exp(uscdat2$value)), exp(3), exp(4), exp(5), exp(6), exp(7)), 0),
+  scale_y_continuous(breaks = c(2, 3, 4, 5, 6, 7, 8),
+                     labels = round(c(min(exp(uscdat2$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8)), 0),
                      expand=c(0, 0),
-                     limits = c(2, 7)) +
-  scale_x_continuous(breaks = seq(0, 20, 1),
+                     limits = c(2, 8)) +
+  scale_x_continuous(breaks = seq(0, 25, 1),
                      expand= c(0,0),
-                     limits = c(0, 20)) +
+                     limits = c(0, 25)) +
   geom_text_repel(data = filter(uscdat2, date == last(uscdat2$date)), aes(label = state),
           force=1,
           point.padding=unit(1,'lines'),
@@ -210,12 +246,7 @@ ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) +
   facet_wrap(~regions) +
   NULL
   
-ggsave("~/Projects/covid-eda/figures/2-US-State-Rate.png", width = 15, height = 10)
-
-
-
-
-
+ggsave("~/Projects/covid-eda/figures/3-US-State-Rate.png", width = 15, height = 10)
 
 
 # US data --------------------------------------------------------
@@ -275,6 +306,6 @@ ggplot(filter(usdat2, date >= as.Date("2020-03-03")), aes(date, value*100, color
           xlim = c(max(usdat$date) + 2.5)) +
   NULL
   
-ggsave("~/Projects/covid-eda/figures/3-US-Mortality-Multiplier.png", width = 12.5, height = 6)
+ggsave("~/Projects/covid-eda/figures/4-US-Mortality-Multiplier.png", width = 12.5, height = 6)
 
 usdat[nrow(usdat), ]
