@@ -156,37 +156,67 @@ ggplot(ccdat, aes(x=ndays, y=value, color=factor(country))) +
                      limits = c(min(ccdat$value), 10)) +
   scale_x_continuous(breaks = seq(0, 70, 5),
                      expand= c(0,0),
-                     limits = c(0, 70)) +
+                     limits = c(0, 80)) +
+  scale_color_manual(values=c("US" = "royalblue", 
+                              "US(non-NY)" = "royalblue",
+                              "Spain" = "darkgrey", 
+                              "Italy"="darkgrey",
+                              "France" = "darkgrey",
+                              "Iran" = "darkgrey",
+                              "Japan" = "darkgrey",
+                              "Korea, South" = "darkgrey",
+                              "UK" = "darkgrey",
+                              "China" = "darkgrey")) +  
   geom_text_repel(data=clabels, aes(label = country),
           # force=1,
           point.padding=unit(1,'lines'),
-          direction = 'x',
-          nudge_x = 1.5,
-          segment.alpha = 0.75) +
+          direction = 'x') +
+          # xlim = c(80, 100)) +
   NULL
 
 ggsave("~/Projects/covid-eda/figures/1-World-Rate.png", width = 10, height = 6)
 
 
+ccdat$ndays_rm <- ccdat$ndays - 3
+ccdat1 <- drop_na(ccdat)
+ccdat1 <- filter(ccdat1, country != "China" & country != "Japan" & country != "Korea, South")
+
+unique(ccdat1$country)
+
+clabels$ndays_rm <- clabels$ndays - 3
 
 # World Rolling Mean Death Rate
-ggplot(filter(ccdat, country != "China"), aes(x=ndays, y=value_rm3, color=factor(country))) + 
+ggplot(ccdat1, aes(x=ndays_rm, y=value_rm3, color=factor(country))) + 
   # scale_alpha_manual(values = c(0.5, 1), guide = FALSE) +
   geom_point(size=0.75) +
   geom_line() +
-  # scale_color_manual(values=c("2" = "RoyalBlue", "1" = "DarkGrey", "0"="LightGrey")) +
+  scale_color_manual(values=c("US" = "royalblue", 
+                              "US(non-NY)" = "royalblue",
+                              "Spain" = "darkgrey", 
+                              "Italy"="darkgrey",
+                              "France" = "darkgrey",
+                              "Iran" = "darkgrey",
+                              "Japan" = "darkgrey",
+                              "Korea, South" = "darkgrey",
+                              "UK" = "darkgrey")) +
+  scale_alpha_manual(values=c("US" = .1, 
+                              "US(non-NY)" = 0.5,
+                              "Spain" = 0.5, 
+                              "Italy"=0.5,
+                              "France" = 0.5,
+                              "Iran" = 0.5,
+                              "Japan" = 0.5,
+                              "Korea, South" = 0.5,
+                              "UK" = 0.5)) +  
   theme_bw(12) +
-  labs(x="Number of days since 10th Death", y="Daily Number of Deaths \n (Right-rolling 3-day mean)") +
+  labs(x="Number of days since 10th Death", y="Daily Number of Deaths \n (3-day Right-rolling mean)") +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
         legend.position = "none") +
-  # scale_y_continuous(breaks = c(0, 1, 2, 3, 4, 5, 6, 7),
-  #                    labels = round(c(exp(0), exp(1), exp(2), exp(3), exp(4), exp(5), exp(6), exp(7)), 0),
-  #                    expand=c(0, 0),
-  #                    limits = c(0, 7)) +
+  scale_y_continuous(breaks = seq(0, 1000, 100)) +
   scale_x_continuous(breaks = seq(0, 40, 5),
                      expand= c(0,0),
-                     limits = c(0, 50)) +
-  geom_text_repel(data=filter(clabels, country != "China"), aes(label = country),
+                     limits = c(0, 40)) +
+  geom_text_repel(data=filter(clabels, country != "China" & country != "Japan" & country != "Korea, South"), aes(label = country),
           # force=1,
           point.padding=unit(1,'lines'),
           direction = 'x',

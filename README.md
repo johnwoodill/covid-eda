@@ -25,7 +25,7 @@ Figure provides the daily number of deaths since the 10th death in each country.
 ----------------------------
 
 
-**Figure 2: US Cumulative Number of Deaths since 10th Death**
+**Figure 3: US Cumulative Number of Deaths since 10th Death**
 
 <p align="center">
 
@@ -35,7 +35,7 @@ Figure provides US cumulative number of deaths since the 10th death grouped by U
 
 ----------------------------
 
-**Figure 3: US Mortality Multiplier**
+**Figure 4: US Mortality Multiplier**
 
 <p align="center">
 
