@@ -3,6 +3,14 @@
 Analysis of the coronavirus pandemic inspired by the great data visualiziation by John Burn-Murdoch at the Financial Times (https://www.ft.com/coronavirus-latest)
 
 ----------------------------
+**Map 1: US Covid-19 County-level Deaths**
+
+<p align="center">
+
+<img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/0-US_County_Death_Map.png?raw=true">
+
+------------------------------------
+
 
 **Figure 1: Cumulative Number of Deaths since 10th Death**
 

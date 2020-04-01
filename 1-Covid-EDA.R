@@ -7,48 +7,52 @@ library(choroplethrMaps)
 library(RColorBrewer)
 
 # # Map of Counties
-# 
-# mapdat <- read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv")
-# current_date <- last(mapdat$date)
-# current_date
-# 
-# mapdat1 <- mapdat %>% 
-#   group_by(state, fips) %>% 
+
+mapdat <- read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv")
+current_date <- last(mapdat$date)
+current_date
+
+mapdat1 <- filter(mapdat, date == current_date) %>% select(fips, deaths)
+
+# mapdat1 <- mapdat %>%
+#   group_by(state, fips) %>%
 #   summarise(total_deaths = sum(deaths, na.rm = TRUE),
-#             total_cases = sum(cases, na.rm = TRUE)) %>% 
-#   ungroup() %>% 
-#   select(fips, total_deaths) %>% 
+#             total_cases = sum(cases, na.rm = TRUE)) %>%
+#   ungroup() %>%
+#   select(fips, total_deaths) %>%
 #   filter(!is.na(fips))
-# 
-# 
-# mapdat1 <- filter(mapdat1, total_deaths >= 5)
-# 
-# # mapdat1$total_deaths <- ifelse(is.na(mapdat1$total_deaths), 0, mapdat1$total_deaths)
-# 
-# 
-# 
-# names(mapdat1) <- c("region", "value")
-# 
-# # usfips <- unique(usmap$fips)
-# mapdat1$region <- str_remove(mapdat1$region, "^0+")
-# 
-# # Remove fips with 999
-# mapdat1 <- mapdat1[-which(substr(mapdat1$region, nchar(mapdat1$region) - 1, nchar(mapdat1$region)) == 99), ]
-# # mapdat1 <- mapdat1[-which(substr(mapdat1$region, nchar(mapdat1$region) - 1, nchar(mapdat1$region)) == 98), ]
-# 
-# mapdat1$region <- as.numeric(mapdat1$region)
-# # mapdat1$value <- cut(mapdat1$value, breaks = 9)
-# 
-# # mapdat1$value <- as.factor(mapdat1$value)
-# 
-# choro = CountyChoropleth$new(mapdat1)
-# choro$title = "2012 Population Estimates"
-# choro$set_num_colors(9)
-# choro$ggplot_scale = scale_fill_brewer(name="Population", palette=7, drop=FALSE)
-# choro$render()
-# 
-# 
-# 
+
+
+names(mapdat1) <- c("region", "value")
+
+mapdat1$region <- str_remove(mapdat1$region, "^0+")
+
+# Remove fips with 999
+mapdat1 <- mapdat1[-which(substr(mapdat1$region, nchar(mapdat1$region) - 1, nchar(mapdat1$region)) == 99), ]
+
+# Recode to numeric
+mapdat1$region <- as.numeric(mapdat1$region)
+
+
+mapdat2 <- mapdat1
+mapdat2$value <- cut(mapdat1$value, breaks = c(1, 10, 25, 50, 75, 100, 150, 200, 1000),
+                     labels = c("1-10", "10-25", "25-50", "50-75", "75-100", "100-150", "150-200", ">200"))
+
+cvalues <- brewer.pal(n=9, "Oranges")[2:9]
+# cvalues <- viridis(option = "D", 10)[3:10]
+
+choro = CountyChoropleth$new(mapdat2)
+choro$title = paste0("US Covid-19 County-level Deaths for ", last(mapdat$date), " \n Total Deaths (", sum(mapdat1$value), ")")
+choro$set_num_colors(7)
+# choro$ggplot_scale = scale_fill_manual(values = cvalues, na.value="white", na.translate=FALSE)
+choro$ggplot_scale = scale_fill_manual(values = cvalues, na.value="white", na.translate=FALSE)
+choro$render() + theme(legend.position = "bottom",
+                       legend.title = element_blank(),
+                       plot.title = element_text(hjust = 0.5))
+
+ggsave("~/Projects/covid-eda/figures/0-US_County_Death_Map.png", width = 10, height = 10)
+
+ 
 # 
 # 
 # 
@@ -339,3 +343,12 @@ ggplot(filter(usdat2, date >= as.Date("2020-03-03")), aes(date, value*100, color
 ggsave("~/Projects/covid-eda/figures/4-US-Mortality-Multiplier.png", width = 12.5, height = 6)
 
 usdat[nrow(usdat), ]
+
+regdat <- filter(ccdat, country == "US") %>% arrange(date)
+regdat$week <- week(regdat$date)
+
+mod <- glm(value ~ lag(value) + week , data = regdat)
+summary(mod)
+
+newdat <- data.frame(value = tail(regdat$value, 2), week = 14)
+predict(mod, newdata = newdat)
