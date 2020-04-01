@@ -42,7 +42,7 @@ cvalues <- brewer.pal(n=9, "Oranges")[2:9]
 # cvalues <- viridis(option = "D", 10)[3:10]
 
 choro = CountyChoropleth$new(mapdat2)
-choro$title = paste0("US Covid-19 County-level Deaths for ", last(mapdat$date), " \n Total Deaths (", sum(mapdat1$value), ")")
+choro$title = paste0("US Covid-19 County-level Deaths (Updated ", last(mapdat$date), ") \n Total Deaths (", sum(mapdat1$value), ")")
 choro$set_num_colors(7)
 # choro$ggplot_scale = scale_fill_manual(values = cvalues, na.value="white", na.translate=FALSE)
 choro$ggplot_scale = scale_fill_manual(values = cvalues, na.value="white", na.translate=FALSE)

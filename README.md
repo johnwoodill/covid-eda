@@ -3,7 +3,7 @@
 Analysis of the coronavirus pandemic inspired by the great data visualiziation by John Burn-Murdoch at the Financial Times (https://www.ft.com/coronavirus-latest)
 
 ----------------------------
-**Map 1: US Covid-19 County-level Deaths**
+**Map 1: Total US Covid-19 County-level Deaths**
 
 <p align="center">
 
