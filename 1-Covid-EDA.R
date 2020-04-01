@@ -186,7 +186,7 @@ unique(ccdat1$country)
 clabels$ndays_rm <- clabels$ndays - 3
 
 # World Rolling Mean Death Rate
-ggplot(ccdat1, aes(x=ndays_rm, y=value_rm3, color=factor(country))) + 
+ggplot(ccdat1, aes(x=ndays_rm, y=(value_rm3), color=factor(country))) + 
   # scale_alpha_manual(values = c(0.5, 1), guide = FALSE) +
   geom_point(size=0.75) +
   geom_line() +
@@ -322,7 +322,7 @@ ggplot(filter(usdat2, date >= as.Date("2020-03-03")), aes(date, value*100, color
   geom_hline(yintercept = 0, linetype="dashed") +
   scale_x_date(date_labels = '%m/%d', 
                limits = c(as.Date("2020-03-03"), max(usdat$date) + 2), 
-               breaks = seq(min(usdat$date), max(usdat$date), "day")) +
+               breaks = seq(min(usdat$date), max(usdat$date) + 3, "day")) +
   labs(x=NULL, y="US Mortality Multiplier \n (Rolling Mean Windows 1-3)") +
   theme(legend.position = "none") +
   # geom_text(data=labelss, aes(date, value, label=label)) +
