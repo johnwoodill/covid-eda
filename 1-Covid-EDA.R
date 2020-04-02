@@ -254,6 +254,10 @@ uscdat2 <- uscdat %>%
 
 uscdat2
 
+uscdat2$regions <- as.character(uscdat2$regions)
+
+uscdat2$regions <- ifelse(is.na(uscdat2$regions), "Other", uscdat2$regions)
+unique(uscdat2$regions)
 
 uscdat2$value <- log(uscdat2$value)
 
@@ -268,18 +272,19 @@ ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) +
                      labels = round(c(min(exp(uscdat2$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8)), 0),
                      expand=c(0, 0),
                      limits = c(2, 8)) +
-  scale_x_continuous(breaks = seq(0, 25, 1),
+  scale_x_continuous(breaks = seq(0, 40, 5),
                      expand= c(0,0),
-                     limits = c(0, 25)) +
+                     limits = c(0, 40)) +
   geom_text_repel(data = filter(uscdat2, date == last(uscdat2$date)), aes(label = state),
           force=1,
           point.padding=unit(1,'lines'),
           direction = 'x',
           nudge_x = 1.5,
           segment.alpha = 0.75) +
-  facet_wrap(~regions) +
+  facet_wrap(~regions, scales = "free") +
   NULL
   
+
 ggsave("~/Projects/covid-eda/figures/3-US-State-Rate.png", width = 15, height = 10)
 
 
