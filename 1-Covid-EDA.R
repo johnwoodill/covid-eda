@@ -357,3 +357,6 @@ summary(mod)
 
 newdat <- data.frame(value = tail(regdat$value, 2), week = 14)
 predict(mod, newdata = newdat)
+
+
+usdat[nrow(usdat), ]
