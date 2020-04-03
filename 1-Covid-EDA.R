@@ -6,6 +6,8 @@ library(choroplethr)
 library(choroplethrMaps)
 library(RColorBrewer)
 
+setwd("~/Projects/covid-eda/")
+
 # # Map of Counties
 
 mapdat <- read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv")
