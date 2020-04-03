@@ -39,6 +39,7 @@ mapdat1$region <- as.numeric(mapdat1$region)
 mapdat2 <- mapdat1
 mapdat2$value <- cut(mapdat1$value, breaks = c(1, 10, 25, 50, 75, 100, 150, 200, 1000),
                      labels = c("1-10", "10-25", "25-50", "50-75", "75-100", "100-150", "150-200", ">200"))
+mapdat2 <- drop_na(mapdat2)
 
 cvalues <- brewer.pal(n=9, "Oranges")[2:9]
 # cvalues <- viridis(option = "D", 10)[3:10]
