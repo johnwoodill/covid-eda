@@ -238,10 +238,12 @@ ggsave("~/Projects/covid-eda/figures/2-World-Daily-Death-Rate.png", width = 10, 
 
 
 
-ggplot(filter(ccdat1, country == "US"), aes(date, daily_deaths)) + 
+ggplot(filter(ccdat1, country == "US" | country == "US(non-NY)"), aes(date, daily_deaths, fill=country)) + 
   geom_bar(stat="identity") +
   theme_bw() +
   labs(x=NULL, y="Daily Death Count") +
+  theme(legend.position = c(.085, .9),
+        legend.title = element_blank()) +
   NULL
 
 ggsave("~/Projects/covid-eda/figures/3-US_Daily-Death-Rate_BarChart.png", width = 10, height = 6)
