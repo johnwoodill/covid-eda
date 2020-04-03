@@ -32,7 +32,7 @@ Figure provides the daily number of deaths since the 10th death in each country.
 
 ----------------------------
 
-**Figure 3: US Daily Death Rate since 10th Death**
+**Figure 3: US Daily Death Count since 10th Death**
 
 <p align="center">
 
