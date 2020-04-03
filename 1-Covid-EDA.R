@@ -184,6 +184,8 @@ ggplot(ccdat, aes(x=ndays, y=value, color=factor(country))) +
 ggsave("~/Projects/covid-eda/figures/1-World-Rate.png", width = 10, height = 6)
 
 
+
+
 ccdat$ndays_rm <- ccdat$ndays - 3
 ccdat1 <- drop_na(ccdat)
 ccdat1 <- filter(ccdat1, country != "China" & country != "Japan" & country != "Korea, South")
@@ -233,6 +235,16 @@ ggplot(ccdat1, aes(x=ndays_rm, y=(value_rm3), color=factor(country))) +
 
 
 ggsave("~/Projects/covid-eda/figures/2-World-Daily-Death-Rate.png", width = 10, height = 6)
+
+
+
+ggplot(filter(ccdat1, country == "US"), aes(date, daily_deaths)) + 
+  geom_bar(stat="identity") +
+  theme_bw() +
+  labs(x=NULL, y="Daily Death Count") +
+  NULL
+
+ggsave("~/Projects/covid-eda/figures/3-US_Daily-Death-Rate_BarChart.png", width = 10, height = 6)
 
 
 #
@@ -288,7 +300,7 @@ ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) +
   NULL
   
 
-ggsave("~/Projects/covid-eda/figures/3-US-State-Rate.png", width = 15, height = 10)
+ggsave("~/Projects/covid-eda/figures/4-US-State-Rate.png", width = 15, height = 10)
 
 
 # US data --------------------------------------------------------
@@ -348,7 +360,7 @@ ggplot(filter(usdat2, date >= as.Date("2020-03-03")), aes(date, value*100, color
           xlim = c(max(usdat$date) + 2.5)) +
   NULL
   
-ggsave("~/Projects/covid-eda/figures/4-US-Mortality-Multiplier.png", width = 12.5, height = 6)
+ggsave("~/Projects/covid-eda/figures/5-US-Mortality-Multiplier.png", width = 12.5, height = 6)
 
 usdat[nrow(usdat), ]
 
