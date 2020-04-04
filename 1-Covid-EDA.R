@@ -10,11 +10,11 @@ setwd("~/Projects/covid-eda/")
 
 # # Map of Counties
 
-mapdat <- read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv")
+mapdat <- as.data.frame(read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"))
 current_date <- last(mapdat$date)
 current_date
 
-mapdat1 <- filter(mapdat, date == current_date) %>% select(fips, deaths)
+mapdat1 <- filter(mapdat, date == current_date) %>% dplyr::select(fips, deaths)
 
 # mapdat1 <- mapdat %>%
 #   group_by(state, fips) %>%
@@ -94,14 +94,14 @@ ggsave("~/Projects/covid-eda/figures/0-US_County_Death_Map.png", width = 10, hei
 # ---------------------------------------------------------------
 # Non-New-York Data
 nonny <- read_csv("http://covidtracking.com/api/states/daily.csv")
-nonny <- select(nonny, state, date, death)
+nonny <- dplyr::select(nonny, state, date, death)
 nonny <- filter(nonny, state != "NY")
 names(nonny) <- c("country", "date", "value")
 nonny <- nonny %>% 
   group_by(date) %>% 
   summarise(value = sum(value, na.rm= TRUE)) %>% 
   mutate(country = "US(non-NY)") %>% 
-  select(country, date, value) %>% 
+  dplyr::select(country, date, value) %>% 
   ungroup()
 
 nonny$date <- as.Date(paste0(substr(nonny$date, 1, 4), "-", substr(nonny$date, 5, 6), "-", substr(nonny$date, 7, 8)))
@@ -109,10 +109,10 @@ nonny$date <- as.Date(as.character(nonny$date), "%Y-%m-%d")
 nonny$date <- format(nonny$date, "%m/%d/%Y")
 
 cdat <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv")
-cdat <- select(cdat, -Lat, -Long)
+cdat <- dplyr::select(cdat, -Lat, -Long)
 cdat <- gather(cdat, key = date, value=value, -`Province/State`, -`Country/Region`)
 names(cdat) <- c("state", "country", "date", "value")
-cdat <- select(cdat, country, date, value)
+cdat <- dplyr::select(cdat, country, date, value)
 
 cdat <- rbind(cdat, nonny)
 
@@ -360,16 +360,16 @@ ggplot(filter(usdat2, date >= as.Date("2020-03-03")), aes(date, value*100, color
   
 ggsave("~/Projects/covid-eda/figures/5-US-Mortality-Multiplier.png", width = 12.5, height = 6)
 
-usdat[nrow(usdat), ]
-
-regdat <- filter(ccdat, country == "US") %>% arrange(date)
-regdat$week <- week(regdat$date)
-
-mod <- glm(value ~ lag(value) + week , data = regdat)
-summary(mod)
-
-newdat <- data.frame(value = tail(regdat$value, 2), week = 14)
-predict(mod, newdata = newdat)
+# usdat[nrow(usdat), ]
+# 
+# regdat <- filter(ccdat, country == "US") %>% arrange(date)
+# regdat$week <- week(regdat$date)
+# 
+# mod <- glm(value ~ lag(value) + week , data = regdat)
+# summary(mod)
+# 
+# newdat <- data.frame(value = tail(regdat$value, 2), week = 14)
+# predict(mod, newdata = newdat)
 
 
 usdat[nrow(usdat), ]
