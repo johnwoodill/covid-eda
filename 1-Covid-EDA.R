@@ -92,10 +92,7 @@ ggsave("~/Projects/covid-eda/figures/0-US_County_Death_Map.png", width = 10, hei
 
 
 # ---------------------------------------------------------------
-
-cdat <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv")
-cdat <- select(cdat, -Lat, -Long)
-
+# Non-New-York Data
 nonny <- read_csv("http://covidtracking.com/api/states/daily.csv")
 nonny <- select(nonny, state, date, death)
 nonny <- filter(nonny, state != "NY")
@@ -111,8 +108,8 @@ nonny$date <- as.Date(paste0(substr(nonny$date, 1, 4), "-", substr(nonny$date, 5
 nonny$date <- as.Date(as.character(nonny$date), "%Y-%m-%d")
 nonny$date <- format(nonny$date, "%m/%d/%Y")
 
-
-
+cdat <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv")
+cdat <- select(cdat, -Lat, -Long)
 cdat <- gather(cdat, key = date, value=value, -`Province/State`, -`Country/Region`)
 names(cdat) <- c("state", "country", "date", "value")
 cdat <- select(cdat, country, date, value)
@@ -130,7 +127,6 @@ ccdat <- cdat %>%
   mutate(daily_deaths = value - lag(value),
          ndays = seq(1, n(), 1),
          value_rm3 = rollmean(daily_deaths, k = 3, align = "right", na.pad = TRUE)) %>% 
-  group_by(country, date) %>% 
   ungroup()
 ccdat
 
@@ -141,7 +137,6 @@ ccdat$value <- log(ccdat$value)
 clabels <- ccdat %>% 
   group_by(country) %>% 
   filter(row_number()==n()) 
-  # mutate(value = exp(value))
 clabels
 
   
@@ -158,7 +153,7 @@ ggplot(ccdat, aes(x=ndays, y=value, color=factor(country))) +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
         legend.position = "none") +
   scale_y_continuous(breaks = c(min(ccdat$value), 3, 4, 5, 6, 7, 8, 9, 10),
-                     labels = round(c(min(exp(ccdat$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8), exp(9), exp(9.5)), 0),
+                     labels = round(c(min(exp(ccdat$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8), exp(9), exp(10)), 0),
                      expand=c(0, 0),
                      limits = c(min(ccdat$value), 10)) +
   scale_x_continuous(breaks = seq(0, 70, 5),
@@ -196,7 +191,6 @@ clabels$ndays_rm <- clabels$ndays - 3
 
 # World Rolling Mean Death Rate
 ggplot(ccdat1, aes(x=ndays_rm, y=(value_rm3), color=factor(country))) + 
-  # scale_alpha_manual(values = c(0.5, 1), guide = FALSE) +
   geom_point(size=0.75) +
   geom_line() +
   scale_color_manual(values=c("US" = "royalblue", 
@@ -221,10 +215,10 @@ ggplot(ccdat1, aes(x=ndays_rm, y=(value_rm3), color=factor(country))) +
   labs(x="Number of days since 10th Death", y="Daily Number of Deaths \n (3-day Right-rolling mean)") +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
         legend.position = "none") +
-  scale_y_continuous(breaks = seq(0, 1000, 100)) +
-  scale_x_continuous(breaks = seq(0, 40, 5),
+  scale_y_continuous(breaks = seq(0, 1500, 100)) +
+  scale_x_continuous(breaks = seq(0, 50, 5),
                      expand= c(0,0),
-                     limits = c(0, 40)) +
+                     limits = c(0, 50)) +
   geom_text_repel(data=filter(clabels, country != "China" & country != "Japan" & country != "Korea, South"), aes(label = country),
           # force=1,
           point.padding=unit(1,'lines'),
@@ -240,10 +234,12 @@ ggsave("~/Projects/covid-eda/figures/2-World-Daily-Death-Rate.png", width = 10, 
 
 ggplot(filter(ccdat1, country == "US" | country == "US(non-NY)"), aes(date, daily_deaths, fill=country)) + 
   geom_bar(stat="identity") +
+  # geom_histogram(alpha=0.2, stat="identity") +
   theme_bw() +
   labs(x=NULL, y="Daily Death Count") +
   theme(legend.position = c(.085, .9),
         legend.title = element_blank()) +
+  facet_wrap(~country) +
   NULL
 
 ggsave("~/Projects/covid-eda/figures/3-US_Daily-Death-Rate_BarChart.png", width = 10, height = 6)
