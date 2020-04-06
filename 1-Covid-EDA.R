@@ -234,6 +234,7 @@ ggsave("~/Projects/covid-eda/figures/2-World-Daily-Death-Rate.png", width = 10, 
 
 ggplot(filter(ccdat1, country == "US" | country == "US(non-NY)"), aes(date, daily_deaths, fill=country)) + 
   geom_bar(stat="identity") +
+  geom_text_repel(data = filter(ccdat1, (date >= today() - 5) & (country == "US" | country == "US(non-NY)")), aes(label=daily_deaths), nudge_y = 20, size=3) +
   # geom_histogram(alpha=0.2, stat="identity") +
   theme_bw() +
   labs(x=NULL, y="Daily Death Count") +
