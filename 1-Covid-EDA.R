@@ -5,6 +5,7 @@ library(lubridate)
 library(choroplethr)
 library(choroplethrMaps)
 library(RColorBrewer)
+library(prophet)
 
 setwd("~/Projects/covid-eda/")
 
@@ -282,10 +283,10 @@ ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) +
   labs(x="Number of days since 10th Death", y="Cumulative Number of Deaths \n (Expressed in logs, displayed as real)") +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
         legend.position = "none") +
-  scale_y_continuous(breaks = c(2, 3, 4, 5, 6, 7, 8, 9),
-                     labels = round(c(min(exp(uscdat2$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8), exp(9)), 0),
+  scale_y_continuous(breaks = c(2, 3, 4, 5, 6, 7, 8, 9, 9.5),
+                     labels = round(c(min(exp(uscdat2$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8), exp(9), exp(0.5)), 0),
                      expand=c(0, 0),
-                     limits = c(2, 9)) +
+                     limits = c(2, 9.5)) +
   scale_x_continuous(breaks = seq(0, 40, 5),
                      expand= c(0,0),
                      limits = c(0, 40)) +
