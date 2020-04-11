@@ -287,9 +287,9 @@ ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) +
                      labels = round(c(min(exp(uscdat2$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8), exp(9), exp(0.5)), 0),
                      expand=c(0, 0),
                      limits = c(2, 9.5)) +
-  scale_x_continuous(breaks = seq(0, 40, 5),
+  scale_x_continuous(breaks = seq(0, 50, 5),
                      expand= c(0,0),
-                     limits = c(0, 40)) +
+                     limits = c(0, 50)) +
   geom_text_repel(data = filter(uscdat2, date == last(uscdat2$date)), aes(label = state),
           force=1,
           point.padding=unit(1,'lines'),
