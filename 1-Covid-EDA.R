@@ -302,6 +302,18 @@ ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) +
 
 ggsave("~/Projects/covid-eda/figures/4-US-State-Rate.png", width = 15, height = 10)
 
+uscdat3 <- uscdat2 %>% 
+  group_by(state) %>% 
+  arrange(date) %>% 
+  mutate(value = exp(value),
+         daily_value = value - lag(value))
+
+ggplot(uscdat3, aes(ndays, daily_value)) + 
+  geom_bar(stat='identity') + 
+  facet_wrap(~state, scales = "free") +
+  NULL
+
+ggsave("~/Projects/covid-eda/figures/5-US-State-Death-Dist.png", width = 15, height = 20)
 
 # US data --------------------------------------------------------
 usdat <- filter(cdat, country == "US")
@@ -360,7 +372,7 @@ ggplot(filter(usdat2, date >= as.Date("2020-03-03")), aes(date, value*100, color
           xlim = c(max(usdat$date) + 2.5)) +
   NULL
   
-ggsave("~/Projects/covid-eda/figures/5-US-Mortality-Multiplier.png", width = 12.5, height = 6)
+ggsave("~/Projects/covid-eda/figures/6-US-Mortality-Multiplier.png", width = 12.5, height = 6)
 
 # usdat[nrow(usdat), ]
 # 
