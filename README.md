@@ -60,7 +60,7 @@ Figure provides US cumulative number of deaths since the 10th death grouped by U
 
 
 ----------------------------
-**Figure 5b: US Cumulative Number of Deaths by State (last 14 days)**
+**Figure 5b: US Cumulative Number of Deaths by State (last 30 days)**
 
 <p align="center">
 
