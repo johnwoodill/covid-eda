@@ -315,6 +315,20 @@ ggplot(uscdat3, aes(ndays, daily_value)) +
 
 ggsave("~/Projects/covid-eda/figures/5-US-State-Death-Dist.png", width = 15, height = 20)
 
+
+uscdat4 <- uscdat3
+
+uscdat4 <- filter(uscdat4, date > today() - 14)
+
+
+ggplot(uscdat4, aes(ndays, daily_value)) + 
+  geom_bar(stat="identity") + 
+  facet_wrap(~state, scales = 'free') +
+  NULL
+#
+
+ggsave("~/Projects/covid-eda/figures/5-US-State-Death-Dist_14.png", width = 15, height = 20)
+
 # US data --------------------------------------------------------
 usdat <- filter(cdat, country == "US")
 usdat
