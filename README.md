@@ -52,7 +52,7 @@ Figure provides US cumulative number of deaths since the 10th death grouped by U
 
 
 ----------------------------
-**Figure 5: US Cumulative Number of Deaths since 10th Death by State**
+**Figure 5: US Number of Deaths since 10th Death by State**
 
 <p align="center">
 
@@ -60,11 +60,19 @@ Figure provides US cumulative number of deaths since the 10th death grouped by U
 
 
 ----------------------------
-**Figure 5b: US Cumulative Number of Deaths by State (last 30 days)**
+**Figure 5b: US Number of Deaths by State (last 30 days)**
 
 <p align="center">
 
-<img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/5-US-State-Death-Dist_14.png?raw=true">
+<img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/5-US-State-Death-Dist_30.png?raw=true">
+
+
+----------------------------
+**Figure 5c: US Number of Deaths by Region (last 30 days)**
+
+<p align="center">
+
+<img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/5-US-Region-Death-Dist_30.png?raw=true">
 
 
 ----------------------------

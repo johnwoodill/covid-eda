@@ -306,30 +306,52 @@ uscdat3 <- uscdat2 %>%
   group_by(state) %>% 
   arrange(date) %>% 
   mutate(value = exp(value),
-         daily_value = value - lag(value))
+         daily_value = value - lag(value)) %>% 
+  arrange(regions) %>% 
+  ungroup
 
-ggplot(uscdat3, aes(ndays, daily_value)) + 
-  geom_bar(stat='identity') + 
-  facet_wrap(~state, scales = "free") +
-  NULL
+# Arrange states by region
+slabels <- data.frame(state = uscdat3$state, region = uscdat3$regions)
+slabels <- distinct(slabels) 
 
-ggsave("~/Projects/covid-eda/figures/5-US-State-Death-Dist.png", width = 15, height = 20)
+uscdat3$state <- factor(uscdat3$state, levels = slabels$state)
+
+# ggplot(uscdat3, aes(ndays, daily_value, fill=regions)) + 
+#   geom_bar(stat='identity') + 
+#   facet_wrap(~state, scales = "free") +
+#   NULL
+# 
+# ggsave("~/Projects/covid-eda/figures/5-US-State-Death-Dist.png", width = 15, height = 20)
 
 
 uscdat4 <- uscdat3
 
-uscdat4 <- filter(uscdat4, date > today() - 14)
+uscdat4 <- filter(uscdat4, date > today() - 30)
 
 
-ggplot(uscdat4, aes(ndays, daily_value)) + 
+ggplot(uscdat4, aes(ndays, daily_value, fill=regions)) + 
   geom_bar(stat="identity") + 
     theme_bw(12) +
   facet_wrap(~state, scales = 'free') +
-  labs(x="Death Count", y = "Number of days") +
+  labs(x="30-Days", y = "Deaths") +
   NULL
 #
 
-ggsave("~/Projects/covid-eda/figures/5-US-State-Death-Dist_14.png", width = 15, height = 20)
+ggsave("~/Projects/covid-eda/figures/5-US-State-Death-Dist_30.png", width = 15, height = 20)
+
+uscdat5 <- uscdat4 %>% group_by(date, regions) %>% summarise(daily_value = sum(daily_value))
+
+
+ggplot(uscdat5, aes(date, daily_value, fill=regions)) + 
+  geom_bar(stat="identity") + 
+    theme_bw(12) +
+  facet_wrap(~regions, scales = 'free') +
+  labs(x="30-Days", y = "Deaths") +
+  theme(legend.position = "none") +
+  NULL
+#
+
+ggsave("~/Projects/covid-eda/figures/5-US-Region-Death-Dist_30.png", width = 18, height = 10)
 
 # US data --------------------------------------------------------
 usdat <- filter(cdat, country == "US")
