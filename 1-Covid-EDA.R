@@ -323,7 +323,9 @@ uscdat4 <- filter(uscdat4, date > today() - 14)
 
 ggplot(uscdat4, aes(ndays, daily_value)) + 
   geom_bar(stat="identity") + 
+    theme_bw(12) +
   facet_wrap(~state, scales = 'free') +
+  labs(x="Death Count", y = "Number of days") +
   NULL
 #
 
