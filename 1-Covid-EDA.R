@@ -316,8 +316,8 @@ slabels <- distinct(slabels)
 
 uscdat3$state <- factor(uscdat3$state, levels = slabels$state)
 
-# ggplot(uscdat3, aes(ndays, daily_value, fill=regions)) + 
-#   geom_bar(stat='identity') + 
+# ggplot(uscdat3, aes(ndays, daily_value, fill=regions)) +
+#   geom_bar(stat='identity') +
 #   facet_wrap(~state, scales = "free") +
 #   NULL
 # 
