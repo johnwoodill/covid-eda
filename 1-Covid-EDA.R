@@ -216,7 +216,7 @@ ggplot(ccdat1, aes(x=ndays_rm, y=(value_rm3), color=factor(country))) +
   labs(x="Number of days since 10th Death", y="Daily Number of Deaths \n (3-day Right-rolling mean)") +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
         legend.position = "none") +
-  scale_y_continuous(breaks = seq(0, 2500, 100)) +
+  scale_y_continuous(breaks = seq(0, 6000, 100)) +
   scale_x_continuous(breaks = seq(0, 50, 5),
                      expand= c(0,0),
                      limits = c(0, 50)) +
@@ -307,7 +307,7 @@ uscdat3 <- uscdat2 %>%
   arrange(date) %>% 
   mutate(value = exp(value),
          daily_value = value - lag(value)) %>% 
-  arrange(regions) %>% 
+  arrange(regions, state) %>% 
   ungroup
 
 # Arrange states by region
