@@ -507,7 +507,6 @@ ndat1 <- ndat %>%
   mutate(lag_value = value - lag(value)) %>% 
   ungroup
 
-# ndat1$date <- as.Date.POSIXct(ndat1$date, tz="")
 
 ggplot(NULL, aes(dss, (diff_yhat))) + 
   geom_bar(stat="identity", alpha=0.5) + 
@@ -523,6 +522,7 @@ ggplot(NULL, aes(dss, (diff_yhat))) +
   NULL
 
 ggsave("~/Projects/covid-eda/figures/7-Model_predictions_distr.png", width = 6, height = 4)
+
 
 
 
