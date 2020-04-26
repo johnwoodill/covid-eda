@@ -81,7 +81,7 @@ Figure provides the US mortality multiplier across various right rolling mean wi
 
 ----------------------------
 
-**Figure 7: Model Predictions
+**Figure 7: Model Predictions**
 
 <p align="center">
 
