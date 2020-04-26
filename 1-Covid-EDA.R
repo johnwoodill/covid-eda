@@ -153,10 +153,10 @@ ggplot(ccdat, aes(x=ndays, y=value, color=factor(country))) +
   labs(x="Number of days since 10th Death", y="Cumulative Number of Deaths \n (Expressed in logs, displayed as absolute values)") +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
         legend.position = "none") +
-  scale_y_continuous(breaks = c(min(ccdat$value), 3, 4, 5, 6, 7, 8, 9, 10, 11),
-                     labels = round(c(min(exp(ccdat$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8), exp(9), exp(10), exp(11)), 0),
+  scale_y_continuous(breaks = c(min(ccdat$value), 3, 4, 5, 6, 7, 8, 9, 10, 11, 11.5),
+                     labels = round(c(min(exp(ccdat$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8), exp(9), exp(10), exp(11), exp(11.5)), 0),
                      expand=c(0, 0),
-                     limits = c(min(ccdat$value), 11)) +
+                     limits = c(min(ccdat$value), 11.5)) +
   scale_x_continuous(breaks = seq(0, 70, 5),
                      expand= c(0,0),
                      limits = c(0, 80)) +
@@ -217,9 +217,9 @@ ggplot(ccdat1, aes(x=ndays_rm, y=(value_rm3), color=factor(country))) +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
         legend.position = "none") +
   scale_y_continuous(breaks = seq(0, 6000, 100)) +
-  scale_x_continuous(breaks = seq(0, 50, 5),
+  scale_x_continuous(breaks = seq(0, 75, 5),
                      expand= c(0,0),
-                     limits = c(0, 50)) +
+                     limits = c(0, 75)) +
   geom_text_repel(data=filter(clabels, country != "China" & country != "Japan" & country != "Korea, South"), aes(label = country),
           # force=1,
           point.padding=unit(1,'lines'),
@@ -283,13 +283,13 @@ ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) +
   labs(x="Number of days since 10th Death", y="Cumulative Number of Deaths \n (Expressed in logs, displayed as real)") +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
         legend.position = "none") +
-  scale_y_continuous(breaks = c(2, 3, 4, 5, 6, 7, 8, 9, 9.5),
-                     labels = round(c(min(exp(uscdat2$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8), exp(9), exp(0.5)), 0),
+  scale_y_continuous(breaks = c(2, 3, 4, 5, 6, 7, 8, 9, 10, 10.5),
+                     labels = round(c(min(exp(uscdat2$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8), exp(9), exp(10), exp(10.5)), 0),
                      expand=c(0, 0),
-                     limits = c(2, 9.5)) +
-  scale_x_continuous(breaks = seq(0, 50, 5),
+                     limits = c(2, 10.5)) +
+  scale_x_continuous(breaks = seq(0, 75, 5),
                      expand= c(0,0),
-                     limits = c(0, 50)) +
+                     limits = c(0, 75)) +
   geom_text_repel(data = filter(uscdat2, date == last(uscdat2$date)), aes(label = state),
           force=1,
           point.padding=unit(1,'lines'),
