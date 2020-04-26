@@ -79,3 +79,10 @@ Figure provides the US mortality multiplier across various right rolling mean wi
 
 
 
+----------------------------
+
+**Figure 7: Model Predictions
+
+<p align="center">
+
+<img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/7-Model_predictions_distr.png?raw=true">
