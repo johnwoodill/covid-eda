@@ -514,9 +514,9 @@ ggplot(NULL, aes(dss, (diff_yhat))) +
   geom_bar(data = ndat1, aes(date, lag_value), stat="identity", fill="cornflowerblue", alpha = 1) +
   geom_vline(xintercept = today(), color="red") +
   theme_bw() +
-  annotate("text", x = as.Date("2020-03-25"), y = 2200, label = "Predicted", color="darkgrey", size=6) +
+  annotate("text", x = as.Date("2020-03-20"), y = 2200, label = "Predicted", color="darkgrey", size=6) +
   annotate("text", x = as.Date("2020-03-17"), y = 1500, label = "Actual", color="cornflowerblue", size=6) +
-    annotate("text", x = today() + 8, y = 2800, label = "Today", color="red", size = 4) +
+  annotate("text", x = today() + 10, y = 2800, label = "Today", color="red", size = 4) +
   labs(x=NULL, y="US Deaths") +
   scale_y_continuous(breaks = seq(0, 2800, 200), limits = c(0, 2800)) +
   scale_x_date(date_breaks="months", date_labels="%b") +
