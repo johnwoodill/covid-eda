@@ -525,5 +525,4 @@ ggsave("~/Projects/covid-eda/figures/7-Model_predictions_distr.png", width = 6, 
 
 
 
-
 usdat[nrow(usdat), ]
