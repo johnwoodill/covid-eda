@@ -509,7 +509,7 @@ ndat1 <- ndat %>%
 
 
 ggplot(NULL, aes(dss, (diff_yhat))) + 
-  geom_bar(stat="identity", alpha=0.5) + 
+  geom_bar(stat="identity", alpha=0.5) +
   geom_bar(data = ndat1, aes(date, lag_value), stat="identity", fill="cornflowerblue", alpha = 1) +
   geom_vline(xintercept = today(), color="red") +
   theme_bw() +
