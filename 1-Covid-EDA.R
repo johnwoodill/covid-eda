@@ -519,7 +519,7 @@ ggplot(NULL, aes(dss, diff_yhat)) +
   annotate("text", x = as.Date("2020-03-20"), y = 2200, label = "Predicted", color="darkgrey", size=6) +
   annotate("text", x = as.Date("2020-03-17"), y = 1500, label = "Actual", color="cornflowerblue", size=6) +
   annotate("text", x = today() + 10, y = 2800, label = "Today", color="red", size = 4) +
-  labs(x=NULL, y="US Deaths \n (Rolling 7-Day Average)") +
+  labs(x=NULL, y="US Deaths \n (7-Day Rolling Average)") +
   scale_y_continuous(breaks = seq(0, 2800, 200), limits = c(0, 2800)) +
   scale_x_date(date_breaks="months", date_labels="%b") +
   NULL
