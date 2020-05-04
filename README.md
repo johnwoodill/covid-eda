@@ -67,6 +67,17 @@ Figure provides US cumulative number of deaths since the 10th death grouped by U
 <img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/5-US-Region-Death-Dist_30.png?raw=true">
 
 
+
+----------------------------
+**Figure 5c: US Number of Cases by Region (last 30 days)**
+
+<p align="center">
+
+<img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/5-US-Region-Cases-Dist_30.png?raw=true">
+
+
+
+
 ----------------------------
 
 **Figure 6: US Mortality Multiplier**

@@ -280,7 +280,8 @@ regions <- data.frame(state = state.abb, regions = state.region)
 uscdat2 <- uscdat %>% 
   filter(death >= 10) %>%
   group_by(date, state) %>% 
-  summarise(value = sum(death, na.rm = TRUE)) %>% 
+  summarise(death = sum(death, na.rm = TRUE),
+            positive = sum(positive, na.rm = TRUE)) %>% 
   group_by(state) %>% 
   arrange(date) %>% 
   mutate(ndays = seq(1, n(), 1)) %>% 
@@ -295,10 +296,10 @@ uscdat2$regions <- as.character(uscdat2$regions)
 uscdat2$regions <- ifelse(is.na(uscdat2$regions), "Other", uscdat2$regions)
 
 # Log values
-uscdat2$value <- log(uscdat2$value)
+uscdat2$death <- log(uscdat2$death)
 
 
-ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) + 
+ggplot(uscdat2, aes(x=ndays, y=death, color=factor(state))) + 
   geom_point(size=0.75) +
   geom_line() +
   theme_bw(12) +
@@ -306,7 +307,7 @@ ggplot(uscdat2, aes(x=ndays, y=value, color=factor(state))) +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
         legend.position = "none") +
   scale_y_continuous(breaks = c(2, 3, 4, 5, 6, 7, 8, 9, 10, 10.5),
-                     labels = round(c(min(exp(uscdat2$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8), exp(9), exp(10), exp(10.5)), 0),
+                     labels = round(c(min(exp(uscdat2$death)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8), exp(9), exp(10), exp(10.5)), 0),
                      expand=c(0, 0),
                      limits = c(2, 10.5)) +
   scale_x_continuous(breaks = seq(0, 75, 5),
@@ -334,10 +335,11 @@ ggsave("~/Projects/covid-eda/figures/4-US-State-Rate.png", width = 15, height = 
 
 # Aggregate data
 uscdat3 <- uscdat2 %>% 
-  group_by(state) %>% 
   arrange(date) %>% 
-  mutate(value = exp(value),
-         daily_value = value - lag(value)) %>% 
+  group_by(state) %>% 
+  mutate(death = exp(death),
+         daily_death = death - lag(death),
+         daily_cases = positive - lag(positive)) %>% 
   arrange(regions, state) %>% 
   ungroup
 
@@ -356,7 +358,7 @@ uscdat4 <- uscdat3
 uscdat4 <- filter(uscdat4, date > today() - 30)
 
 
-ggplot(uscdat4, aes(ndays, daily_value, fill=regions)) + 
+ggplot(uscdat4, aes(ndays, daily_death, fill=regions)) + 
   geom_bar(stat="identity") + 
     theme_bw(12) +
   facet_wrap(~state, scales = 'free') +
@@ -377,21 +379,47 @@ ggsave("~/Projects/covid-eda/figures/5-US-State-Death-Dist_30.png", width = 15, 
 # Figure 5b: US Number of Deaths by Region (last 30 days)
 
 # Aggregate data
-uscdat5 <- uscdat4 %>% group_by(date, regions) %>% summarise(daily_value = sum(daily_value))
+uscdat5 <- uscdat4 %>% 
+  group_by(date, regions) %>% 
+  summarise(daily_death = sum(daily_death, na.rm = TRUE))
 
 
-ggplot(uscdat5, aes(date, daily_value, fill=regions)) + 
+ggplot(uscdat5, aes(date, daily_death, fill=regions)) + 
   geom_bar(stat="identity") + 
     theme_bw(12) +
   facet_wrap(~regions, scales = 'free') +
-  labs(x="30-Days", y = "Deaths") +
+  labs(x="30-Days", y = "Daily Deaths") +
   theme(legend.position = "none") +
   NULL
 
 ggsave("~/Projects/covid-eda/figures/5-US-Region-Death-Dist_30.png", width = 18, height = 10)
 
 
+# ------------------------------------------------------------
+# Figure 5c: US Number of Cases by Region (last 30 days)
 
+# Aggregate data
+uscdat5 <- uscdat4 %>% 
+  # arrange(date) %>%
+  # group_by(state) %>%
+  # mutate(daily_cases = positive - lag(positive)) %>%
+  group_by(date, regions) %>% 
+  summarise(daily_cases = sum(daily_cases, na.rm = TRUE)) %>% 
+  arrange(date) %>% 
+  group_by(regions) %>% 
+  mutate(rm_daily_cases = rollmean(daily_cases, k = 7, align = "right", na.pad = TRUE))
+
+
+ggplot(uscdat5, aes(date, daily_cases, fill=regions)) + 
+  geom_bar(stat="identity") + 
+  # geom_line(data = uscdat5, aes(date, rm_daily_cases, color=regions), color = "black") + 
+  theme_bw(12) +
+  facet_wrap(~regions, scales = 'free') +
+  labs(x="30-Days", y = "Daily Cases") +
+  theme(legend.position = "none") +
+  NULL
+
+ggsave("~/Projects/covid-eda/figures/5-US-Region-Cases-Dist_30.png", width = 18, height = 10)
 
 
 
@@ -399,41 +427,42 @@ ggsave("~/Projects/covid-eda/figures/5-US-Region-Death-Dist_30.png", width = 18,
 # Figure 6: US Mortality Multiplier
 
 usdat <- filter(cdat, country == "US")
+names(usdat)[3] <- "death"
 
 # Recode date
 usdat$date <- as.Date(usdat$date, "%m/%d/%y")
 
 # Aggregate data
 usdat <- usdat %>% 
-  filter(value > 0) %>% 
+  filter(death > 0) %>% 
   group_by(date) %>% 
-  summarise(value = sum((value))) %>% 
+  summarise(death = sum((death))) %>% 
   arrange(date) %>% 
   ungroup
 
 # Rollmean
-usdat$rm2 <- rollmean(usdat$value, k = 2, na.pad = TRUE, align = "right")
-usdat$rm3 <- rollmean(usdat$value, k = 3, na.pad = TRUE, align = "right")
-usdat$rm4 <- rollmean(usdat$value, k = 4, na.pad = TRUE, align = "right")
+usdat$rm2 <- rollmean(usdat$death, k = 2, na.pad = TRUE, align = "right")
+usdat$rm3 <- rollmean(usdat$death, k = 3, na.pad = TRUE, align = "right")
+usdat$rm4 <- rollmean(usdat$death, k = 4, na.pad = TRUE, align = "right")
 
 # Recode variables
-usdat$`R-RM1` <- (usdat$value - lag(usdat$value))/(lag(usdat$value))
+usdat$`R-RM1` <- (usdat$death - lag(usdat$death))/(lag(usdat$death))
 usdat$`R-RM2` <- (usdat$rm2 - lag(usdat$rm2))/(lag(usdat$rm2))
 usdat$`R-RM3` <- (usdat$rm3 - lag(usdat$rm3))/(lag(usdat$rm3))
 
 # Gather data for plotting
-usdat2 <- select(usdat, -value, -rm2, -rm3, -rm4) %>% 
-  gather(key=rm, value=value, -date)
+usdat2 <- select(usdat, -death, -rm2, -rm3, -rm4) %>% 
+  gather(key=rm, value=death, -date)
 
 # Get labels
 labelss <- usdat[nrow(usdat), ]
-labelss <- select(labelss, -value, -rm2, -rm3, -rm4) %>% 
-  gather(key=rm, value=value, -date)
-labelss$label <- paste0(labelss$rm, ": ", 1 + round(labelss$value, 2), "x")
+labelss <- select(labelss, -death, -rm2, -rm3, -rm4) %>% 
+  gather(key=rm, value=death, -date)
+labelss$label <- paste0(labelss$rm, ": ", 1 + round(labelss$death, 2), "x")
 
 
-ggplot(filter(usdat2, date >= as.Date("2020-03-03")), aes(date, value*100, color=factor(rm))) + 
-  geom_smooth(aes(date, value*100, group=1)) +
+ggplot(filter(usdat2, date >= as.Date("2020-03-03")), aes(date, death*100, color=factor(rm))) + 
+  geom_smooth(aes(date, death*100, group=1)) +
   geom_point() + 
   geom_line() +
   theme_bw() +
@@ -446,7 +475,7 @@ ggplot(filter(usdat2, date >= as.Date("2020-03-03")), aes(date, value*100, color
                breaks = seq(min(usdat$date), max(usdat$date) + 3, "day")) +
   labs(x=NULL, y="US Mortality Multiplier \n (Rolling Mean Windows 1-3)") +
   theme(legend.position = "none") +
-  # geom_text(data=labelss, aes(date, value, label=label)) +
+  # geom_text(data=labelss, aes(date, death, label=label)) +
   geom_text_repel(data = labelss,
           aes(label = label),
           force=1,
@@ -503,17 +532,16 @@ ndat$date <- as.Date(paste0(substr(ndat$date, 1, 4), "-", substr(ndat$date, 5, 6
 
 ndat1 <- ndat %>% 
   group_by(date) %>% 
-  summarise(value = sum(death, na.rm = TRUE)) %>% 
-  mutate(lag_value = value - lag(value),
-         rm_value = rollmean(lag_value, align="right", k=7, na.pad = TRUE)) %>% 
+  summarise(death = sum(death, na.rm = TRUE)) %>% 
+  mutate(lag_death = value - lag(death),
+         rm_death = rollmean(lag_death, align="right", k=7, na.pad = TRUE)) %>% 
   ungroup
 
 
 ggplot(NULL, aes(dss, diff_yhat)) + 
-  # geom_bar(data = ndat1, aes(date, lag_value), stat="identity", fill="darkred", alpha = 0.5) +
+  # geom_bar(stat="identity", alpha=0.5) +
+  geom_bar(data = ndat1, aes(date, rm_death), stat="identity", fill="cornflowerblue", alpha = 1) +
   geom_bar(stat="identity", alpha=0.5) +
-  geom_bar(data = ndat1, aes(date, rm_value), stat="identity", fill="cornflowerblue", alpha = 1) +
-  
   geom_vline(xintercept = today(), color="red") +
   theme_bw() +
   annotate("text", x = as.Date("2020-03-20"), y = 2200, label = "Predicted", color="darkgrey", size=6) +
