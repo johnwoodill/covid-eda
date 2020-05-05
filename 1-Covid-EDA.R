@@ -533,14 +533,14 @@ ndat$date <- as.Date(paste0(substr(ndat$date, 1, 4), "-", substr(ndat$date, 5, 6
 ndat1 <- ndat %>% 
   group_by(date) %>% 
   summarise(death = sum(death, na.rm = TRUE)) %>% 
-  mutate(lag_death = value - lag(death),
+  mutate(lag_death = death - lag(death),
          rm_death = rollmean(lag_death, align="right", k=7, na.pad = TRUE)) %>% 
   ungroup
 
 
 ggplot(NULL, aes(dss, diff_yhat)) + 
   # geom_bar(stat="identity", alpha=0.5) +
-  geom_bar(data = ndat1, aes(date, rm_death), stat="identity", fill="cornflowerblue", alpha = 1) +
+  geom_bar(data = ndat1, aes(date, rm_death), stat="identity", fill="cornflowerblue", alpha = 0.75) +
   geom_bar(stat="identity", alpha=0.5) +
   geom_vline(xintercept = today(), color="red") +
   theme_bw() +
@@ -557,3 +557,4 @@ ggsave("~/Projects/covid-eda/figures/7-Model_predictions_distr.png", width = 6, 
 
 
 usdat[nrow(usdat), ]
+
