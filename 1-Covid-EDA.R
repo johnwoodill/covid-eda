@@ -355,7 +355,7 @@ uscdat3$state <- factor(uscdat3$state, levels = slabels$state)
 uscdat4 <- uscdat3
 
 # Keep last 30 days
-uscdat4 <- filter(uscdat4, date > today() - 30)
+uscdat4 <- filter(uscdat4, date > today() - 60)
 
 
 ggplot(uscdat4, aes(ndays, daily_death, fill=regions)) + 
@@ -412,7 +412,8 @@ uscdat5 <- uscdat4 %>%
 
 ggplot(uscdat5, aes(date, daily_cases, fill=regions)) + 
   geom_bar(stat="identity") + 
-  # geom_line(data = uscdat5, aes(date, rm_daily_cases, color=regions), color = "black") + 
+  # geom_smooth() + 
+  geom_line(data = uscdat5, aes(date, rm_daily_cases, color=regions), color = "black") +
   theme_bw(12) +
   facet_wrap(~regions, scales = 'free') +
   labs(x="30-Days", y = "Daily Cases") +
