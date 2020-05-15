@@ -283,7 +283,7 @@ ggplot(ccdat3, aes(date, deaths_rm, fill=group)) +
   geom_text_repel(data = filter(ccdat3, (date >= today() - 5) & (group == "US" | group == "US(non-NY)")), aes(label=deaths), nudge_y = 20, size=3) +
   # geom_histogram(alpha=0.2, stat="identity") +
   theme_bw() +
-  labs(x=NULL, y="Daily Death Count") +
+  labs(x=NULL, y="Daily Death") +
   theme(legend.position = c(.085, .9),
         legend.title = element_blank()) +
   facet_wrap(~group) +
@@ -302,7 +302,7 @@ ggplot(ccdat3, aes(date, cases_rm, fill=group)) +
   geom_text_repel(data = filter(ccdat3, (date >= today() - 5) & (group == "US" | group == "US(non-NY)")), aes(label=deaths), nudge_y = 20, size=3) +
   # geom_histogram(alpha=0.2, stat="identity") +
   theme_bw() +
-  labs(x=NULL, y="Daily Death Count") +
+  labs(x=NULL, y="Daily Cases") +
   theme(legend.position = c(.085, .9),
         legend.title = element_blank()) +
   facet_wrap(~group) +
