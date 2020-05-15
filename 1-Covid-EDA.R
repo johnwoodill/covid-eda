@@ -244,22 +244,71 @@ ggsave("~/Projects/covid-eda/figures/0-US_County_Death_Map.png", width = 10, hei
 
 # ------------------------------------------------------------
 # Figure 3: US Daily Death Count since 10th Death
+ccdat <- read_csv("http://covidtracking.com/api/states/daily.csv")
+ccdat$date <- as.Date(paste0(substr(ccdat$date, 1, 4), "-", substr(ccdat$date, 5, 6), "-", substr(ccdat$date, 7, 8)))
 
-ggplot(filter(ccdat1, country == "US" | country == "US(non-NY)"), aes(date, daily_deaths, fill=country)) + 
+ccdat <- ccdat %>% 
+  group_by(date, state) %>% 
+  summarise(deaths = sum(death, na.rm = TRUE),
+            cases = sum(positive, na.rm = TRUE)) %>% 
+  arrange(date) %>% 
+  group_by(state) %>% 
+  mutate(deaths = deaths - lag(deaths),
+         cases = cases - lag(cases)) %>% 
+  ungroup()
+
+
+ccdat$group <- "US"
+
+ccdat1 <- filter(ccdat, state != "NY")
+ccdat1$group <- "US(non-NY)"
+
+ccdat2 <- rbind(ccdat, ccdat1)
+
+ccdat2 <- filter(ccdat2, deaths >= 10)
+
+ccdat3 <- ccdat2 %>% 
+  arrange(date) %>% 
+  group_by(date, group) %>% 
+  summarise(deaths = sum(deaths),
+            cases = sum(cases)) %>% 
+  group_by(group) %>% 
+  mutate(deaths_rm = rollmean(deaths, k = 7, na.pad = TRUE, align = "right"),
+         cases_rm = rollmean(cases, 7, na.pad = TRUE, align = "right")) %>% 
+  ungroup()
+
+
+ggplot(ccdat3, aes(date, deaths_rm, fill=group)) + 
   geom_bar(stat="identity") +
-  geom_text_repel(data = filter(ccdat1, (date >= today() - 5) & (country == "US" | country == "US(non-NY)")), aes(label=daily_deaths), nudge_y = 20, size=3) +
+  geom_text_repel(data = filter(ccdat3, (date >= today() - 5) & (group == "US" | group == "US(non-NY)")), aes(label=deaths), nudge_y = 20, size=3) +
   # geom_histogram(alpha=0.2, stat="identity") +
   theme_bw() +
   labs(x=NULL, y="Daily Death Count") +
   theme(legend.position = c(.085, .9),
         legend.title = element_blank()) +
-  facet_wrap(~country) +
+  facet_wrap(~group) +
   NULL
 
 ggsave("~/Projects/covid-eda/figures/3-US_Daily-Death-Rate_BarChart.png", width = 10, height = 6)
 
 
 
+
+
+
+
+ggplot(ccdat3, aes(date, cases_rm, fill=group)) + 
+  geom_bar(stat="identity") +
+  geom_text_repel(data = filter(ccdat3, (date >= today() - 5) & (group == "US" | group == "US(non-NY)")), aes(label=deaths), nudge_y = 20, size=3) +
+  # geom_histogram(alpha=0.2, stat="identity") +
+  theme_bw() +
+  labs(x=NULL, y="Daily Death Count") +
+  theme(legend.position = c(.085, .9),
+        legend.title = element_blank()) +
+  facet_wrap(~group) +
+  NULL
+
+ggsave("~/Projects/covid-eda/figures/3-US_Daily-Cases-Rate_BarChart.png", width = 10, height = 6)
 
 
 # 
