@@ -437,7 +437,7 @@ uscdat4 <- uscdat4 %>%
 ggplot(uscdat4, aes(ndays, daily_death, fill=regions)) + 
   geom_bar(stat="identity") + 
     theme_bw(12) +
-  facet_wrap(~state, scales = 'free') +
+  facet_wrap(~state, scales = 'free', ncol = 5) +
   labs(x="30-Days", y = "Deaths") +
   geom_smooth(se = FALSE, size=0.5) +
   NULL
@@ -454,7 +454,7 @@ ggsave("~/Projects/covid-eda/figures/5-US-State-Death-Dist_30.png", width = 15, 
 ggplot(uscdat4, aes(ndays, daily_cases, fill=regions)) + 
   geom_bar(stat="identity") + 
     theme_bw(12) +
-  facet_wrap(~state, scales = 'free') +
+  facet_wrap(~state, scales = 'free', ncol = 5) +
   labs(x="Days", y = "Daily Cases") +
   geom_smooth(se = FALSE, size=0.5) +
   NULL
