@@ -387,6 +387,9 @@ ggsave("~/Projects/covid-eda/figures/3-US_Daily-Cases-Rate_BarChart.png", width 
 uscdat <- read_csv("http://covidtracking.com/api/states/daily.csv")
 uscdat$date <- as.Date(paste0(substr(uscdat$date, 1, 4), "-", substr(uscdat$date, 5, 6), "-", substr(uscdat$date, 7, 8)))
 
+# # Get US regions
+regions <- data.frame(state = state.abb, regions = state.region)
+
 # Aggregate data
 uscdat2 <- uscdat %>%
   filter(death >= 10) %>%
@@ -584,8 +587,11 @@ dat$date <- as.Date(paste0(substr(dat$date, 1, 4), "-", substr(dat$date, 5, 6), 
 dat$date <- as.Date(as.character(dat$date), "%Y-%m-%d")
 
 
-dat1 <- dat %>% group_by(date) %>% summarise(y = sum(death, na.rm=TRUE))
-dat1$cap <- 60000
+dat1 <- dat %>% 
+  group_by(date) %>% 
+  summarise(y = sum(death, na.rm=TRUE))
+
+dat1$cap <- 100000
 
 names(dat1) <- c("ds", "y", "cap")
 
@@ -593,7 +599,7 @@ mod = prophet(dat1, growth='logistic')
 
 # Predictions
 future <- make_future_dataframe(mod, periods = 100)
-future$cap <- 60000
+future$cap <- 100000
 fcst <- predict(mod, future)
 
 # Density estimate
@@ -626,7 +632,7 @@ ggplot(NULL, aes(dss, diff_yhat)) +
   annotate("text", x = as.Date("2020-03-17"), y = 1500, label = "Actual", color="cornflowerblue", size=6) +
   annotate("text", x = today() + 10, y = 2800, label = "Today", color="red", size = 4) +
   labs(x=NULL, y="US Deaths \n (7-Day Rolling Average)") +
-  scale_y_continuous(breaks = seq(0, 2800, 200), limits = c(0, 2800)) +
+  scale_y_continuous(breaks = seq(0, 2700, 200), limits = c(0, 2600)) +
   scale_x_date(date_breaks="months", date_labels="%b") +
   NULL
 
@@ -634,5 +640,5 @@ ggsave("~/Projects/covid-eda/figures/7-Model_predictions_distr.png", width = 6, 
 
 
 
-usdat[nrow(usdat), ]
+first(ndat$date)
 

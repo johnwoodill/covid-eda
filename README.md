@@ -18,7 +18,7 @@ Analysis of the coronavirus pandemic inspired by the great data visualiziation b
 <img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/3-US_Daily-Death-Rate_BarChart.png?raw=true">
 
 
-**Figure 3: US Daily Death Count since 10th Death**
+**Figure 3: US Daily Cases Count since 10th Death**
 
 <p align="center">
 
