@@ -280,7 +280,7 @@ ccdat3 <- ccdat2 %>%
 
 ggplot(ccdat3, aes(date, deaths_rm, fill=group)) + 
   geom_bar(stat="identity") +
-  geom_text_repel(data = filter(ccdat3, (date >= today() - 5) & (group == "US" | group == "US(non-NY)")), aes(label=deaths), nudge_y = 20, size=3) +
+  geom_text_repel(data = filter(ccdat3, (date >= today() - 5) & (group == "US" | group == "US(non-NY)")), aes(label=round(deaths_rm, 0), nudge_y = 20, size=3) +
   # geom_histogram(alpha=0.2, stat="identity") +
   theme_bw() +
   labs(x=NULL, y="Daily Death") +
@@ -299,7 +299,7 @@ ggsave("~/Projects/covid-eda/figures/3-US_Daily-Death-Rate_BarChart.png", width 
 
 ggplot(ccdat3, aes(date, cases_rm, fill=group)) + 
   geom_bar(stat="identity") +
-  geom_text_repel(data = filter(ccdat3, (date >= today() - 5) & (group == "US" | group == "US(non-NY)")), aes(label=deaths), nudge_y = 20, size=3) +
+  geom_text_repel(data = filter(ccdat3, (date >= today() - 5) & (group == "US" | group == "US(non-NY)")), aes(label=cases_rm), nudge_y = 20, size=3) +
   # geom_histogram(alpha=0.2, stat="identity") +
   theme_bw() +
   labs(x=NULL, y="Daily Cases") +
