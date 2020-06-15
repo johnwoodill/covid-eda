@@ -58,6 +58,15 @@ Analysis of the coronavirus pandemic inspired by the great data visualiziation b
 
 
 ----------------------------
+**Figure 5c: US Percent Positive Tests by State**
+
+<p align="center">
+
+<img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/8-Percent-positive-tests-state.png?raw=true">
+
+
+
+----------------------------
 
 **Figure 7: Model Predictions**
 

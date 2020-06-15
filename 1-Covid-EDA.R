@@ -6,10 +6,9 @@ library(choroplethr)
 library(choroplethrMaps)
 library(RColorBrewer)
 library(prophet)
-library(prophet)
 library(scales)
 
-setwd("~/Projects/covid-eda/")
+#setwd("~/Projects/covid-eda/")
 
 # ------------------------------------------------------------
 # Figure 1 - Map of Counties
@@ -55,7 +54,7 @@ choro$render() + theme(legend.position = "bottom",
                        legend.title = element_blank(),
                        plot.title = element_text(hjust = 0.5))
 
-ggsave("~/Projects/covid-eda/figures/0-US_County_Death_Map.png", width = 10, height = 10)
+ggsave("figures/0-US_County_Death_Map.png", width = 10, height = 10)
 
 
 
@@ -289,7 +288,7 @@ ggplot(ccdat3, aes(date, deaths_rm, fill=group)) +
   facet_wrap(~group) +
   NULL
 
-ggsave("~/Projects/covid-eda/figures/3-US_Daily-Death-Rate_BarChart.png", width = 10, height = 6)
+ggsave("figures/3-US_Daily-Death-Rate_BarChart.png", width = 10, height = 6)
 
 
 
@@ -308,7 +307,7 @@ ggplot(ccdat3, aes(date, cases_rm, fill=group)) +
   facet_wrap(~group) +
   NULL
 
-ggsave("~/Projects/covid-eda/figures/3-US_Daily-Cases-Rate_BarChart.png", width = 10, height = 6)
+ggsave("figures/3-US_Daily-Cases-Rate_BarChart.png", width = 10, height = 6)
 
 
 # 
@@ -446,7 +445,7 @@ ggplot(uscdat4, aes(ndays, daily_death, fill=regions)) +
   NULL
 
 
-ggsave("~/Projects/covid-eda/figures/5-US-State-Death-Dist_30.png", width = 15, height = 20)
+ggsave("figures/5-US-State-Death-Dist_30.png", width = 15, height = 20)
 
 
 
@@ -462,7 +461,7 @@ ggplot(uscdat4, aes(ndays, daily_cases, fill=regions)) +
   geom_smooth(se = FALSE, size=0.5) +
   NULL
 
-ggsave("~/Projects/covid-eda/figures/5-US-State-Cases-Dist_30.png", width = 15, height = 20)
+ggsave("figures/5-US-State-Cases-Dist_30.png", width = 15, height = 20)
 
 
 # ------------------------------------------------------------
@@ -484,7 +483,7 @@ ggplot(uscdat5, aes(date, daily_death, fill=regions)) +
   geom_smooth(se = FALSE, size=0.5) +
   NULL
 
-ggsave("~/Projects/covid-eda/figures/5-US-Region-Death-Dist_30.png", width = 18, height = 10)
+ggsave("figures/5-US-Region-Death-Dist_30.png", width = 18, height = 10)
 
 
 # ------------------------------------------------------------
@@ -500,7 +499,7 @@ ggplot(uscdat5, aes(date, daily_cases, fill=regions)) +
   geom_smooth(se = FALSE, size=0.5) +
   NULL
 
-ggsave("~/Projects/covid-eda/figures/5-US-Region-Cases-Dist_30.png", width = 18, height = 10)
+ggsave("figures/5-US-Region-Cases-Dist_30.png", width = 18, height = 10)
 
 
 # 
@@ -636,9 +635,49 @@ ggplot(NULL, aes(dss, diff_yhat)) +
   scale_x_date(date_breaks="months", date_labels="%b") +
   NULL
 
-ggsave("~/Projects/covid-eda/figures/7-Model_predictions_distr.png", width = 6, height = 4)
+ggsave("figures/7-Model_predictions_distr.png", width = 6, height = 4)
 
 
 
 first(ndat$date)
 
+# ------------------------------------------------------------
+# Figure 8: Percent positive tests by state
+
+# State level dat
+dat_raw <- read_csv("http://covidtracking.com/api/v1/states/daily.csv")
+dat_per <- dat_raw %>%
+  mutate(date = as.Date(as.character(date), "%Y%m%d")) %>%
+  mutate(total_test = positive + negative) %>%
+  group_by(state, date) %>%
+  summarize(positive = sum(positive, na.rm = T),
+            total_test = sum(total_test, na.rm = T)) %>%
+  ungroup(.) %>%
+  mutate(per_pos = (positive / total_test) * 100) %>%
+  mutate(per_pos_7 = rollmean(per_pos, k = 7, align = "right", na.pad = T)) %>%
+  # Testing before april 15 was sporadic)
+  filter(date > mdy("04-15-2020"))
+
+# Code states into 3 risk groups
+dat_risk <- dat_per %>%
+  group_by(state) %>%
+  summarize(curr_per = per_pos_7[which.max(date)],
+            last_per = per_pos_7[which.max(date) - 1]) %>%
+  ungroup(.) %>%
+  mutate(ch_per = (curr_per - last_per) / last_per) %>%
+  mutate(risk = if_else(ch_per < -0.004, 1,
+                        if_else(ch_per >= -0.004 & ch_per < 0.004, 2, 3))) %>%
+  select(state, risk)
+
+dat_per <- dat_per %>%
+  left_join(dat_risk, by = "state") %>%
+  drop_na(risk)
+
+ggplot(data = dat_per) +
+  geom_bar(aes(date, per_pos, fill = as.factor(risk)), stat = "identity", show.legend = F) +
+  scale_fill_manual(values = c("darkgreen", "gold", "red")) +
+  facet_wrap(~state, scales = 'free', ncol = 5) +
+  theme_bw() +
+  labs(x = "Date", y = "Pecent of tests positive (%)")
+
+ggsave("figures/8-Percent-positive-tests-state.png", width = 15, height = 20)
