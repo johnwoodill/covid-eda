@@ -58,7 +58,7 @@ Analysis of the coronavirus pandemic inspired by the great data visualiziation b
 
 
 ----------------------------
-**Figure 5c: US Percent Positive Tests by State**
+**Figure 5e: US Percent Positive Tests by State**
 
 <p align="center">
 
