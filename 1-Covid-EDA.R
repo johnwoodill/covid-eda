@@ -8,7 +8,7 @@ library(RColorBrewer)
 library(prophet)
 library(scales)
 
-#setwd("~/Projects/covid-eda/")
+setwd("~/Projects/covid-eda/")
 
 # ------------------------------------------------------------
 # Figure 1 - Map of Counties
