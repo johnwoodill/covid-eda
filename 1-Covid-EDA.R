@@ -703,6 +703,7 @@ ggplot(dat_per2, aes(date, per_pos, color=state)) + geom_line() +
   theme_bw() +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
        legend.position = "none") +
+  scale_color_viridis_d() +
   geom_text_repel(data = filter(dat_per2, date == last(dat_per$date) & risk == 3), aes(label=state)) +
   labs(x=NULL, y="Pecent of tests positive (%)") +
   facet_wrap(~regions) +
