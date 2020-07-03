@@ -681,3 +681,31 @@ ggplot(data = dat_per) +
   labs(x = "Date", y = "Pecent of tests positive (%)")
 
 ggsave("figures/8-Percent-positive-tests-state.png", width = 15, height = 20)
+
+
+
+
+
+
+
+
+#### Figure of growth rates
+dat_per2 <- left_join(dat_per, regions, by='state')
+dat_per2 <- drop_na(dat_per2)
+
+## Get last 30 days
+dat_per2 <- filter(dat_per2, date >= today() - 30)
+
+## Get most at risk states
+dat_per2 <- filter(dat_per2, risk == 3)
+
+ggplot(dat_per2, aes(date, per_pos, color=state)) + geom_line() + 
+  theme_bw() +
+  theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
+       legend.position = "none") +
+  geom_text_repel(data = filter(dat_per2, date == last(dat_per$date) & risk == 3), aes(label=state)) +
+  labs(x=NULL, y="Pecent of tests positive (%)") +
+  facet_wrap(~regions) +
+  NULL
+
+ggsave("figures/9-Percent-positive-tests-region-risk3.png", width=12, height=4)

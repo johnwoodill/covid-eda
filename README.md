@@ -65,6 +65,13 @@ Analysis of the coronavirus pandemic inspired by the great data visualiziation b
 <img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/8-Percent-positive-tests-state.png?raw=true">
 
 
+----------------------------
+**Figure 5f: US Percent Positive Tests by State-Region Most at Risk**
+
+<p align="center">
+
+<img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/9-Percent-positive-tests-region-risk3.png?raw=true">
+  
 
 ----------------------------
 
@@ -73,3 +80,6 @@ Analysis of the coronavirus pandemic inspired by the great data visualiziation b
 <p align="center">
 
 <img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/7-Model_predictions_distr.png?raw=true">
+
+
+
