@@ -709,4 +709,4 @@ ggplot(dat_per2, aes(date, per_pos, color=state)) + geom_line() +
   facet_wrap(~regions) +
   NULL
 
-ggsave("figures/9-Percent-positive-tests-region-risk3.png", width=12, height=4)
+ggsave("figures/9-Percent-positive-tests-region-risk3.png", width=12, height=6)
