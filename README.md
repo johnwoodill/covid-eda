@@ -60,7 +60,7 @@ Analysis of the coronavirus pandemic inspired by the great data visualiziation b
 
 ----------------------------
 
-**Figure 7: Model Predictions**
+**Figure 7: Model Predictions for 100,000 Deaths
 
 <p align="center">
 
