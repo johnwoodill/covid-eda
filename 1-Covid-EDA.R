@@ -699,7 +699,8 @@ dat_per2 <- filter(dat_per2, date >= today() - 30)
 ## Get most at risk states
 dat_per2 <- filter(dat_per2, risk == 3)
 
-ggplot(dat_per2, aes(date, per_pos, color=state)) + geom_line() + 
+ggplot(dat_per2, aes(date, per_pos, color=state)) + 
+  geom_line() + 
   theme_bw() +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
        legend.position = "none") +

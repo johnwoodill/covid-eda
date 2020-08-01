@@ -11,14 +11,14 @@ Analysis of the coronavirus pandemic inspired by the great data visualiziation b
 
 ----------------------------
 
-**Figure 2: US Daily Death Count since 10th Death**
+**Figure 2: US Daily Death Count since 10th Death - 7-Day Rolling Mean**
 
 <p align="center">
 
 <img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/3-US_Daily-Death-Rate_BarChart.png?raw=true">
 
 
-**Figure 3: US Daily Cases Count since 10th Death**
+**Figure 3: US Daily Cases Count since 10th Death - 7-Day Rolling Mean**
 
 <p align="center">
 
@@ -26,18 +26,18 @@ Analysis of the coronavirus pandemic inspired by the great data visualiziation b
 
 ----------------------------
 
-**Figure 5a: US Number of Deaths by State (last 30 days)**
+# **Figure 5a: US Number of Deaths by State (last 30 days)**
+# 
+# <p align="center">
+# 
+# <img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/5-US-State-Death-Dist_30.png?raw=true">
 
-<p align="center">
 
-<img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/5-US-State-Death-Dist_30.png?raw=true">
-
-
-**Figure 5b: US Number of Cases by State (last 30 days)**
-
-<p align="center">
-
-<img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/5-US-State-Cases-Dist_30.png?raw=true">
+# **Figure 5b: US Number of Cases by State (last 30 days)**
+# 
+# <p align="center">
+# 
+# <img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/5-US-State-Cases-Dist_30.png?raw=true">
 
 
 ----------------------------
