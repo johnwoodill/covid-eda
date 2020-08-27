@@ -650,11 +650,11 @@ dat_per <- dat_raw %>%
   mutate(date = as.Date(as.character(date), "%Y%m%d")) %>%
   mutate(total_test = positive + negative) %>%
   group_by(state, date) %>%
-  summarize(positive = sum(positive, na.rm = T),
-            total_test = sum(total_test, na.rm = T)) %>%
+  summarize(positive = sum(positive, na.rm = TRUE),
+            total_test = sum(total_test, na.rm = TRUE)) %>%
   ungroup(.) %>%
   mutate(per_pos = (positive / total_test) * 100) %>%
-  mutate(per_pos_7 = rollmean(per_pos, k = 7, align = "right", na.pad = T)) %>%
+  mutate(per_pos_7 = rollmean(per_pos, k = 7, align = "right", na.pad = TRUE)) %>%
   # Testing before april 15 was sporadic)
   filter(date > mdy("04-15-2020"))
 
