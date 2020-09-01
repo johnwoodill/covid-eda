@@ -12,7 +12,6 @@ setwd("~/Projects/covid-eda/")
 
 # ------------------------------------------------------------
 # Figure 1 - Map of Counties
-
 mapdat <- as.data.frame(read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"))
 
 # Current date of data
