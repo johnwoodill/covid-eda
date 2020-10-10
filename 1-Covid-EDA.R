@@ -80,11 +80,11 @@ ggsave("figures/0-US_County_Death_Map.png", width = 10, height = 10)
 # names(nonny) <- c("country", "date", "value")
 # 
 # # Aggregate count
-# nonny <- nonny %>% 
-#   group_by(date) %>% 
-#   summarise(value = sum(value, na.rm= TRUE)) %>% 
-#   mutate(country = "US(non-NY)") %>% 
-#   dplyr::select(country, date, value) %>% 
+# nonny <- nonny %>%
+#   group_by(date) %>%
+#   summarise(value = sum(value, na.rm= TRUE)) %>%
+#   mutate(country = "US(non-NY)") %>%
+#   dplyr::select(country, date, value) %>%
 #   ungroup()
 # 
 # # Recode date
@@ -113,15 +113,15 @@ ggsave("figures/0-US_County_Death_Map.png", width = 10, height = 10)
 # # Recode date
 # cdat$date <- as.Date(cdat$date, "%m/%d/%y")
 # 
-# # World data 
-# ccdat <- cdat %>% 
-#   filter(value >= 10 & (country %in% c("US", "US(non-NY)", "China", "Italy", "Iran", "Spain", "United Kingdom", "Japan", "Korea, South", "France"))) %>% 
-#   group_by(country, date) %>% 
+# # World data
+# ccdat <- cdat %>%
+#   filter(value >= 10 & (country %in% c("US", "US(non-NY)", "China", "Italy", "Iran", "Spain", "United Kingdom", "Japan", "Korea, South", "France"))) %>%
+#   group_by(country, date) %>%
 #   arrange(date) %>%
 #   summarise(value = sum(value)) %>%
 #   mutate(daily_deaths = value - lag(value),
 #          ndays = seq(1, n(), 1),
-#          value_rm3 = rollmean(daily_deaths, k = 3, align = "right", na.pad = TRUE)) %>% 
+#          value_rm3 = rollmean(daily_deaths, k = 3, align = "right", na.pad = TRUE)) %>%
 #   ungroup()
 # 
 # # Rename UK
@@ -131,38 +131,38 @@ ggsave("figures/0-US_County_Death_Map.png", width = 10, height = 10)
 # ccdat$value <- log(ccdat$value)
 # 
 # # Get number of days
-# clabels <- ccdat %>% 
-#   group_by(country) %>% 
-#   filter(row_number()==n()) 
+# clabels <- ccdat %>%
+#   group_by(country) %>%
+#   filter(row_number()==n())
 # 
 # # Recode for colors
 # ccdat$cat <- as.character(ifelse(ccdat$country == "US", 1, 0))
 # ccdat$cat <- as.character(ifelse(ccdat$country == "US(non-NY)", 2, ccdat$cat))
 # 
-# ggplot(ccdat, aes(x=ndays, y=value, color=factor(country))) + 
+# ggplot(ccdat, aes(x=ndays, y=value, color=factor(country))) +
 #   geom_point(size=0.75) +
 #   geom_line() +
 #   theme_bw(12) +
 #   labs(x="Number of days since 10th Death", y="Cumulative Number of Deaths \n (Expressed in logs, displayed as absolute values)") +
 #   theme(panel.border = element_rect(colour = "black", fill=NA, size=1),
 #         legend.position = "none") +
-#   scale_y_continuous(breaks = c(min(ccdat$value), 3, 4, 5, 6, 7, 8, 9, 10, 11, 11.5),
-#                      labels = round(c(min(exp(ccdat$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8), exp(9), exp(10), exp(11), exp(11.5)), 0),
-#                      expand=c(0, 0),
-#                      limits = c(min(ccdat$value), 11.5)) +
-#   scale_x_continuous(breaks = seq(0, 70, 5),
-#                      expand= c(0,0),
-#                      limits = c(0, 80)) +
-#   scale_color_manual(values=c("US" = "royalblue", 
+#   # scale_y_continuous(breaks = c(min(ccdat$value), 3, 4, 5, 6, 7, 8, 9, 10, 11, 11.5),
+#   #                    labels = round(c(min(exp(ccdat$value)), exp(3), exp(4), exp(5), exp(6), exp(7), exp(8), exp(9), exp(10), exp(11), exp(11.5)), 0),
+#   #                    expand=c(0, 0),
+#   #                    limits = c(min(ccdat$value), 11.5)) +
+#   # scale_x_continuous(breaks = seq(0, 70, 5),
+#   #                    expand= c(0,0),
+#   #                    limits = c(0, 80)) +
+#   scale_color_manual(values=c("US" = "royalblue",
 #                               "US(non-NY)" = "royalblue",
-#                               "Spain" = "darkgrey", 
+#                               "Spain" = "darkgrey",
 #                               "Italy"="darkgrey",
 #                               "France" = "darkgrey",
 #                               "Iran" = "darkgrey",
 #                               "Japan" = "darkgrey",
 #                               "Korea, South" = "darkgrey",
 #                               "UK" = "darkgrey",
-#                               "China" = "darkgrey")) +  
+#                               "China" = "darkgrey")) +
 #   geom_text_repel(data=clabels, aes(label = country),
 #           point.padding=unit(1,'lines'),
 #           direction = 'x') +
