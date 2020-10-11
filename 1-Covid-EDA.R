@@ -640,35 +640,37 @@ ggsave("figures/7-Model_predictions_distr.png", width = 6, height = 4)
 
 
 
-first(ndat$date)
+
 
 # ------------------------------------------------------------
 # Figure 8: Percent positive tests by state
 
 # State level dat
-dat_raw <- read_csv("http://covidtracking.com/api/v1/states/daily.csv")
+dat_raw <- as.data.frame(read_csv("http://covidtracking.com/api/v1/states/daily.csv"))
+
 dat_per <- dat_raw %>%
   mutate(date = as.Date(as.character(date), "%Y%m%d")) %>%
   mutate(total_test = positive + negative) %>%
   group_by(state, date) %>%
-  summarize(positive = sum(positive, na.rm = TRUE),
+  summarise(positive = sum(positive, na.rm = TRUE),
             total_test = sum(total_test, na.rm = TRUE)) %>%
-  ungroup(.) %>%
   mutate(per_pos = (positive / total_test) * 100) %>%
   mutate(per_pos_7 = rollmean(per_pos, k = 7, align = "right", na.pad = TRUE)) %>%
   # Testing before april 15 was sporadic)
-  filter(date > mdy("04-15-2020"))
+  filter(date > mdy("04-15-2020")) %>% 
+  ungroup() %>% 
+  as.data.frame()
 
 # Code states into 3 risk groups
 dat_risk <- dat_per %>%
   group_by(state) %>%
-  summarize(curr_per = per_pos_7[which.max(date)],
+  summarise(curr_per = per_pos_7[which.max(date)],
             last_per = per_pos_7[which.max(date) - 1]) %>%
-  ungroup(.) %>%
   mutate(ch_per = (curr_per - last_per) / last_per) %>%
   mutate(risk = if_else(ch_per < -0.004, 1,
                         if_else(ch_per >= -0.004 & ch_per < 0.004, 2, 3))) %>%
-  select(state, risk)
+  dplyr::select(state, risk) %>% 
+  ungroup()
 
 dat_per <- dat_per %>%
   left_join(dat_risk, by = "state") %>%
@@ -712,3 +714,8 @@ ggplot(dat_per2, aes(date, per_pos, color=state)) +
   NULL
 
 ggsave("figures/9-Percent-positive-tests-region-risk3.png", width=12, height=6)
+
+
+
+
+first(ndat$date)
