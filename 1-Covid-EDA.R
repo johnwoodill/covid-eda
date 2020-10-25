@@ -7,7 +7,7 @@ library(choroplethrMaps)
 library(RColorBrewer)
 library(prophet)
 library(scales)
-
+library(cowplot)
 
 
 setwd("~/Projects/covid-eda/")
@@ -250,65 +250,74 @@ ccdat$date <- as.Date(paste0(substr(ccdat$date, 1, 4), "-", substr(ccdat$date, 5
 ccdat <- ccdat %>% 
   group_by(date, state) %>% 
   summarise(deaths = sum(death, na.rm = TRUE),
-            cases = sum(positive, na.rm = TRUE)) %>% 
+            cases = sum(positive, na.rm = TRUE),
+            total_pos = sum(positive, na.rm = TRUE),
+            total_neg = sum(negative, na.rm = TRUE)) %>% 
   arrange(date) %>% 
   group_by(state) %>% 
   mutate(deaths = deaths - lag(deaths),
-         cases = cases - lag(cases)) %>% 
+         cases = cases - lag(cases),
+         total_tests = sum(total_pos, total_neg, na.rm=TRUE)) %>% 
   ungroup()
 
 
-ccdat$group <- "US"
+ccdat <- filter(ccdat, deaths >= 10)
 
-ccdat1 <- filter(ccdat, state != "NY")
-ccdat1$group <- "US(non-NY)"
-
-ccdat2 <- rbind(ccdat, ccdat1)
-
-ccdat2 <- filter(ccdat2, deaths >= 10)
-
-ccdat3 <- ccdat2 %>% 
+ccdat <- ccdat %>% 
   arrange(date) %>% 
-  group_by(date, group) %>% 
+  group_by(date) %>% 
   summarise(deaths = sum(deaths),
-            cases = sum(cases)) %>% 
-  group_by(group) %>% 
+            cases = sum(cases),
+            total_pos = sum(total_pos),
+            total_tests = sum(total_tests),
+            test_rate = (total_pos / total_tests)) %>% 
   mutate(deaths_rm = rollmean(deaths, k = 7, na.pad = TRUE, align = "right"),
          cases_rm = rollmean(cases, 7, na.pad = TRUE, align = "right")) %>% 
   ungroup()
 
 
-ggplot(ccdat3, aes(date, deaths_rm, fill=group)) + 
-  geom_bar(stat="identity") +
-  geom_text_repel(data = filter(ccdat3, (date >= today() - 5) & (group == "US" | group == "US(non-NY)")), aes(label=round(deaths_rm, 0)), nudge_y = 20, size=3) +
-  # geom_histogram(alpha=0.2, stat="identity") +
-  theme_bw() +
-  labs(x=NULL, y="Daily Death") +
-  theme(legend.position = c(.085, .9),
-        legend.title = element_blank()) +
-  facet_wrap(~group) +
-  NULL
-
-ggsave("figures/3-US_Daily-Death-Rate_BarChart.png", width = 10, height = 6)
-
-
-
-
-
-
-
-ggplot(ccdat3, aes(date, cases_rm, fill=group)) + 
-  geom_bar(stat="identity") +
-  geom_text_repel(data = filter(ccdat3, (date >= today() - 5) & (group == "US" | group == "US(non-NY)")), aes(label=round(cases_rm, 0)), nudge_y = 20, size=3) +
+p1 <- ggplot(ccdat, aes(date, cases_rm)) + 
+  geom_bar(stat="identity", fill="cornflowerblue") +
+  geom_text_repel(data = filter(ccdat, (date >= today() - 5)), aes(label=round(cases_rm, 0)), nudge_y = 20, size=3) +
   # geom_histogram(alpha=0.2, stat="identity") +
   theme_bw() +
   labs(x=NULL, y="Daily Cases") +
   theme(legend.position = c(.085, .9),
         legend.title = element_blank()) +
-  facet_wrap(~group) +
   NULL
 
-ggsave("figures/3-US_Daily-Cases-Rate_BarChart.png", width = 10, height = 6)
+p2 <- ggplot(ccdat, aes(date, deaths_rm)) + 
+  geom_bar(stat="identity", fill="coral") +
+  geom_text_repel(data = filter(ccdat, (date >= today() - 5)), aes(label=round(deaths_rm, 0)), nudge_y = 20, size=3) +
+  # geom_histogram(alpha=0.2, stat="identity") +
+  theme_bw() +
+  labs(x=NULL, y="Daily Death") +
+  theme(legend.position = c(.085, .9),
+        legend.title = element_blank()) +
+  NULL
+
+p3 <- ggplot(ccdat, aes(date, test_rate)) + 
+  geom_bar(stat="identity", fill="coral") +
+  geom_text_repel(data = filter(ccdat, (date >= today() - 5)), aes(label=round(test_rate, 4)), nudge_y = 20, size=3) +
+  # geom_histogram(alpha=0.2, stat="identity") +
+  theme_bw() +
+  labs(x=NULL, y="Daily Test Rate (%)") +
+  theme(legend.position = c(.085, .9),
+        legend.title = element_blank()) +
+  NULL
+
+
+
+
+plot_grid(p1, p2, ncol=1)
+
+ggsave("figures/US_Daily-Cases-Death-Rate_BarChart.png", width = 10, height = 8)
+
+
+
+
+
+
 
 
 # 

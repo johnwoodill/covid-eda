@@ -11,18 +11,12 @@ Analysis of the coronavirus pandemic inspired by the great data visualiziation b
 
 ----------------------------
 
-**Figure 2: US Daily Death Count since 10th Death - 7-Day Rolling Mean**
+**Figure 2: US Daily Cases and Death Count since 10th Death - 7-Day Rolling Mean**
 
 <p align="center">
 
-<img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/3-US_Daily-Death-Rate_BarChart.png?raw=true">
+<img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/US_Daily-Cases-Death-Rate_BarChart.png?raw=true">
 
-
-**Figure 3: US Daily Cases Count since 10th Death - 7-Day Rolling Mean**
-
-<p align="center">
-
-<img align="center" width="800" src="https://github.com/johnwoodill/covid-eda/raw/master/figures/3-US_Daily-Cases-Rate_BarChart.png?raw=true">
 
 
 ----------------------------
