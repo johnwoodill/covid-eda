@@ -244,72 +244,55 @@ ggsave("figures/0-US_County_Death_Map.png", width = 10, height = 10)
 
 # ------------------------------------------------------------
 # Figure 3: US Daily Death Count since 10th Death
-ccdat <- read_csv("http://covidtracking.com/api/states/daily.csv")
-ccdat$date <- as.Date(paste0(substr(ccdat$date, 1, 4), "-", substr(ccdat$date, 5, 6), "-", substr(ccdat$date, 7, 8)))
+ccdat <- as.data.frame(read_csv("http://covidtracking.com/api/states/daily.csv"))
+
+ccdat$date <- as.character(paste0(substr(ccdat$date, 1, 4), "-", substr(ccdat$date, 5, 6), "-", substr(ccdat$date, 7, 8)))
 
 ccdat <- ccdat %>% 
-  group_by(date, state) %>% 
-  summarise(deaths = sum(death, na.rm = TRUE),
-            cases = sum(positive, na.rm = TRUE),
-            total_pos = sum(positive, na.rm = TRUE),
-            total_neg = sum(negative, na.rm = TRUE)) %>% 
-  arrange(date) %>% 
-  group_by(state) %>% 
-  mutate(deaths = deaths - lag(deaths),
-         cases = cases - lag(cases),
-         total_tests = sum(total_pos, total_neg, na.rm=TRUE)) %>% 
-  ungroup()
-
-
-ccdat <- filter(ccdat, deaths >= 10)
-
-ccdat <- ccdat %>% 
-  arrange(date) %>% 
   group_by(date) %>% 
-  summarise(deaths = sum(deaths),
-            cases = sum(cases),
-            total_pos = sum(total_pos),
-            total_tests = sum(total_tests),
-            test_rate = (total_pos / total_tests)) %>% 
-  mutate(deaths_rm = rollmean(deaths, k = 7, na.pad = TRUE, align = "right"),
-         cases_rm = rollmean(cases, 7, na.pad = TRUE, align = "right")) %>% 
-  ungroup()
+  summarise(positive = sum(positive),
+            negative = sum(negative),
+            death = sum(death)) %>% 
+  ungroup() %>% 
+  arrange(date) %>% 
+  mutate(pos_diff = positive - lag(positive),
+         neg_diff = negative - lag(negative),
+         death_diff = death - lag(death),
+         total_tests = pos_diff + neg_diff,
+         pos_rate = ( (pos_diff) / (total_tests) ) * 100) %>% 
+  mutate(rm_pos_diff = rollmean(pos_diff, k = 7, align = "right", na.pad = TRUE),
+         rm_neg_diff = rollmean(neg_diff, k = 7, align = "right", na.pad = TRUE),
+         rm_death_diff = rollmean(death_diff, k = 7, align = "right", na.pad = TRUE),
+         rm_pos_rate = rollmean(pos_rate, k = 7, align = "right", na.pad = TRUE)) %>% 
+  as.data.frame() %>% 
+  dplyr::select(date, pos_diff, death_diff, pos_rate, total_tests, rm_pos_diff, rm_neg_diff, rm_death_diff, rm_pos_rate) %>% 
+  arrange(date)
 
+# ccdat <- filter(ccdat, death_diff >= 10)
 
-p1 <- ggplot(ccdat, aes(date, cases_rm)) + 
+p1 <- ggplot(ccdat, aes(as.POSIXct(date), rm_pos_diff)) + 
   geom_bar(stat="identity", fill="cornflowerblue") +
-  geom_text_repel(data = filter(ccdat, (date >= today() - 5)), aes(label=round(cases_rm, 0)), nudge_y = 20, size=3) +
-  # geom_histogram(alpha=0.2, stat="identity") +
+  geom_text_repel(data = filter(ccdat, (date >= today() - 2)), aes(label=round(rm_pos_diff, 0)), nudge_y = 200, size=3) +
   theme_bw() +
-  labs(x=NULL, y="Daily Cases") +
-  theme(legend.position = c(.085, .9),
-        legend.title = element_blank()) +
+  labs(x=NULL, y="7-Day Average Daily Cases") +
   NULL
 
-p2 <- ggplot(ccdat, aes(date, deaths_rm)) + 
+p2 <- ggplot(ccdat, aes(as.POSIXct(date), rm_death_diff)) + 
   geom_bar(stat="identity", fill="coral") +
-  geom_text_repel(data = filter(ccdat, (date >= today() - 5)), aes(label=round(deaths_rm, 0)), nudge_y = 20, size=3) +
-  # geom_histogram(alpha=0.2, stat="identity") +
+  geom_text_repel(data = filter(ccdat, (date >= today() - 2)), aes(label=round(rm_death_diff, 0)), nudge_y = 50, size=3) +
   theme_bw() +
-  labs(x=NULL, y="Daily Death") +
-  theme(legend.position = c(.085, .9),
-        legend.title = element_blank()) +
+  labs(x=NULL, y="7-Day Average Daily Death") +
   NULL
 
-p3 <- ggplot(ccdat, aes(date, test_rate)) + 
-  geom_bar(stat="identity", fill="coral") +
-  geom_text_repel(data = filter(ccdat, (date >= today() - 5)), aes(label=round(test_rate, 4)), nudge_y = 20, size=3) +
-  # geom_histogram(alpha=0.2, stat="identity") +
+p3 <- ggplot(ccdat, aes(as.POSIXct(date), rm_pos_rate)) + 
+  geom_bar(stat="identity", fill="darkgreen") +
+  geom_text_repel(data = filter(ccdat, (date >= today() - 2)), aes(label=round(rm_pos_rate, 2)), nudge_y = 2, size=3) +
   theme_bw() +
-  labs(x=NULL, y="Daily Test Rate (%)") +
-  theme(legend.position = c(.085, .9),
-        legend.title = element_blank()) +
+  labs(x=NULL, y="7-Day Average Daily Test Rate (%)") +
   NULL
 
 
-
-
-plot_grid(p1, p2, ncol=1)
+plot_grid(p1, p2, p3, ncol=1)
 
 ggsave("figures/US_Daily-Cases-Death-Rate_BarChart.png", width = 10, height = 8)
 
@@ -727,4 +710,22 @@ ggsave("figures/9-Percent-positive-tests-region-risk3.png", width=12, height=6)
 
 
 
-first(ndat$date)
+filter(ndat, date >= first(ndat$date) - 30) %>% 
+  group_by(date) %>% 
+  summarise(positive = sum(positive),
+            negative = sum(negative),
+            death = sum(death)) %>% 
+  ungroup() %>% 
+  mutate(pos_diff = positive - lag(positive),
+         neg_diff = negative - lag(negative),
+         death_diff = death - lag(death),
+         pos_rate = (pos_diff / (pos_diff + neg_diff) ) * 100) %>% 
+  mutate(rm_pos_diff = rollmean(pos_diff, k = 7, align = "right", na.pad = TRUE),
+         rm_death_diff = rollmean(death_diff, k = 7, align = "right", na.pad = TRUE),
+         rm_pos_rate = rollmean(pos_rate, k = 7, align = "right", na.pad = TRUE)) %>% 
+  as.data.frame() %>% 
+  dplyr::select(date, pos_diff, death_diff, pos_rate, rm_pos_diff, rm_death_diff, rm_pos_rate) %>% 
+  drop_na() %>% 
+  tail(14)
+  
+
