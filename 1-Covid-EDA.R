@@ -277,19 +277,23 @@ p1 <- ggplot(ccdat, aes(as.POSIXct(date), rm_pos_diff)) +
   labs(x=NULL, y="7-Day Average Daily Cases") +
   NULL
 
-p2 <- ggplot(ccdat, aes(as.POSIXct(date), rm_death_diff)) + 
+
+p2 <- ggplot(ccdat, aes(as.POSIXct(date), rm_pos_rate)) + 
+  geom_bar(stat="identity", fill="darkgreen") +
+  geom_text_repel(data = filter(ccdat, (date >= today() - 2)), aes(label=round(rm_pos_rate, 2)), nudge_y = 2, size=3) +
+  theme_bw() +
+  labs(x=NULL, y="7-Day Average Daily Test Rate (%)") +
+  NULL
+
+
+p3 <- ggplot(ccdat, aes(as.POSIXct(date), rm_death_diff)) + 
   geom_bar(stat="identity", fill="coral") +
   geom_text_repel(data = filter(ccdat, (date >= today() - 2)), aes(label=round(rm_death_diff, 0)), nudge_y = 50, size=3) +
   theme_bw() +
   labs(x=NULL, y="7-Day Average Daily Death") +
   NULL
 
-p3 <- ggplot(ccdat, aes(as.POSIXct(date), rm_pos_rate)) + 
-  geom_bar(stat="identity", fill="darkgreen") +
-  geom_text_repel(data = filter(ccdat, (date >= today() - 2)), aes(label=round(rm_pos_rate, 2)), nudge_y = 2, size=3) +
-  theme_bw() +
-  labs(x=NULL, y="7-Day Average Daily Test Rate (%)") +
-  NULL
+
 
 
 plot_grid(p1, p2, p3, ncol=1)
